@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Inicio - Stockly</title>
+    <link rel="stylesheet" href="static/css/styles.css">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="static/js/views/home.js" type="module" defer></script>
+
+</head>
+<body>
+    <nav>
+        <a href="{{ url_for('main.home') }}">Inicio</a>
+        <a href="{{ url_for('main.inventario') }}">Inventario</a>
+        <a href="{{ url_for('main.login') }}">Login</a>
+    </nav>
+
+
+    <main id="app">
+        <h2>[[ message ]]</h2>
+        <p>[[ descripcion ]]</p>
+    </main>
+
+
+    <footer>
+        <p>© 2025 Stockly</p>
+    </footer>
+</body>
+</html>
