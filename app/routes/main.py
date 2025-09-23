@@ -13,3 +13,15 @@ def inventario():
 @main_bp.route('/login')
 def login():
     return render_template('auth/login.html')
+
+@main_bp.route('/pedidos')
+def pedidos():
+    return render_template('pedidos.html')
+
+@main_bp.route('/reportes')
+def reportes():
+    return render_template('reportes.html')
+
+@main_bp.route('/cuenta')
+def cuenta():
+    return render_template('cuenta.html')
