@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inventario</title>
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#447d9b] min-h-screen flex justify-center p-4">
+
+  <div class="w-full max-w-6xl bg-[#447d9b] rounded-lg p-4">
+    
+    <!-- Header con Logo y Menú -->
+    <header class="flex justify-center items-center mb-4 relative">
+      <!-- Logo -->
+      <div 
+        class="absolute top-0 left-0 w-16 h-16 rounded-lg bg-center bg-contain bg-no-repeat"
+        style="background-image: url('../resources/Logo.png');">
+    </div>
+
+      <!-- Menú -->
+      <nav class="bg-white rounded-full px-9 py-4">
+        <ul class="flex gap-8">
+          <li><a href="#" class="text-black hover:text-[#fe7743]">Home</a></li>
+          <li><a href="#" class="text-[#fe7743]">Stock</a></li>
+          <li><a href="#" class="text-black hover:text-[#fe7743]">Pedidos</a></li>
+          <li><a href="#" class="text-black hover:text-[#fe7743]">Reportes</a></li>
+          <li><a href="#" class="text-black hover:text-[#fe7743]">Cuenta</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <!-- Barra superior: búsqueda y filtro -->
+    <div class="bg-white rounded-t-lg flex items-center p-3 gap-2">
+        <input type="text" placeholder="Buscar..." 
+            class="border rounded-full px-3 py-1 text-sm outline-none">
+        <button class="font-bold">Filtro</button>
+    </div>
+
+    <!-- Contenedor de tabla -->
+    <div class="bg-white rounded-b-lg max-h-80 overflow-y-auto">
+      <table class="w-full border-collapse text-sm">
+        <thead class="bg-gray-100 sticky top-0">
+          <tr class="text-left">
+            <th class="p-2">Imagen</th>
+            <th class="p-2">Nombre</th>
+            <th class="p-2">Categoría</th>
+            <th class="p-2">Stock</th>
+            <th class="p-2">Precio</th>
+            <th class="p-2">Disponible</th>
+            <th class="p-2"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Producto ejemplo -->
+          <tr class="border-b hover:bg-gray-50">
+            <td class="p-2">
+              <div class="w-10 h-10 bg-gray-300 rounded bg-center bg-contain bg-no-repeat"
+                   style="background-image: url('../resources/producto.png');">
+              </div>
+            </td>
+            <td class="p-2">Objeto en inventario por ser vendido</td>
+            <td class="p-2">Categoría</td>
+            <td class="p-2">999</td>
+            <td class="p-2">$99</td>
+            <td class="p-2">
+              <!-- Switch -->
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" class="sr-only peer" checked>
+                <div class="w-9 h-5 bg-gray-300 rounded-full peer-checked:bg-[#fe7743] transition-colors"></div>
+                <div class="absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition-transform peer-checked:translate-x-4"></div>
+              </label>
+            </td>
+            <td class="p-2">
+              <!-- Botón eliminar -->
+              <button 
+                class="w-6 h-6 bg-center bg-no-repeat bg-contain hover:scale-110 hover:opacity-80 transition-transform"
+                style="background-image: url('https://cdn-icons-png.flaticon.com/512/18/18297.png');">
+              </button>
+            </td>
+          </tr>
+
+          <tr class="border-b hover:bg-gray-50">
+            <td class="p-2">
+              <div class="w-10 h-10 bg-gray-300 rounded bg-center bg-contain bg-no-repeat"
+                   style="background-image: url('../resources/producto.png');">
+              </div>
+            </td>
+            <td class="p-2">Objeto en inventario por ser vendido</td>
+            <td class="p-2">Categoría</td>
+            <td class="p-2">999</td>
+            <td class="p-2">$99</td>
+            <td class="p-2">
+              <!-- Switch -->
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" class="sr-only peer" checked>
+                <div class="w-9 h-5 bg-gray-300 rounded-full peer-checked:bg-[#fe7743] transition-colors"></div>
+                <div class="absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition-transform peer-checked:translate-x-4"></div>
+              </label>
+            </td>
+            <td class="p-2">
+              <!-- Botón eliminar -->
+              <button 
+                class="w-6 h-6 bg-center bg-no-repeat bg-contain hover:scale-110 hover:opacity-80 transition-transform"
+                style="background-image: url('https://cdn-icons-png.flaticon.com/512/18/18297.png');">
+              </button>
+            </td>
+          </tr>
+          
+          <tr class="border-b hover:bg-gray-50">
+            <td class="p-2">
+              <div class="w-10 h-10 bg-gray-300 rounded bg-center bg-contain bg-no-repeat"
+                   style="background-image: url('../resources/producto.png');">
+              </div>
+            </td>
+            <td class="p-2">Objeto en inventario por ser vendido</td>
+            <td class="p-2">Categoría</td>
+            <td class="p-2">999</td>
+            <td class="p-2">$99</td>
+            <td class="p-2">
+              <!-- Switch -->
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" class="sr-only peer" checked>
+                <div class="w-9 h-5 bg-gray-300 rounded-full peer-checked:bg-[#fe7743] transition-colors"></div>
+                <div class="absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition-transform peer-checked:translate-x-4"></div>
+              </label>
+            </td>
+            <td class="p-2">
+              <!-- Botón eliminar -->
+              <button 
+                class="w-6 h-6 bg-center bg-no-repeat bg-contain hover:scale-110 hover:opacity-80 transition-transform"
+                style="background-image: url('https://cdn-icons-png.flaticon.com/512/18/18297.png');">
+              </button>
+            </td>
+          </tr>
+
+          <tr class="border-b hover:bg-gray-50">
+            <td class="p-2">
+              <div class="w-10 h-10 bg-gray-300 rounded bg-center bg-contain bg-no-repeat"
+                   style="background-image: url('../resources/producto.png');">
+              </div>
+            </td>
+            <td class="p-2">Objeto en inventario por ser vendido</td>
+            <td class="p-2">Categoría</td>
+            <td class="p-2">999</td>
+            <td class="p-2">$99</td>
+            <td class="p-2">
+              <!-- Switch -->
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" class="sr-only peer" checked>
+                <div class="w-9 h-5 bg-gray-300 rounded-full peer-checked:bg-[#fe7743] transition-colors"></div>
+                <div class="absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition-transform peer-checked:translate-x-4"></div>
+              </label>
+            </td>
+            <td class="p-2">
+              <!-- Botón eliminar -->
+              <button 
+                class="w-6 h-6 bg-center bg-no-repeat bg-contain hover:scale-110 hover:opacity-80 transition-transform"
+                style="background-image: url('https://cdn-icons-png.flaticon.com/512/18/18297.png');">
+              </button>
+            </td>
+          </tr>
+
+          <!-- Repite este bloque para más productos -->
+          <tr class="border-b hover:bg-gray-50">
+            <td class="p-2">
+              <div class="w-10 h-10 bg-gray-300 rounded bg-center bg-contain bg-no-repeat"></div>
+            </td>
+            <td class="p-2">Objeto en inventario por ser vendido</td>
+            <td class="p-2">Categoría</td>
+            <td class="p-2">999</td>
+            <td class="p-2">$99</td>
+            <td class="p-2">
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" class="sr-only peer">
+                <div class="w-9 h-5 bg-gray-300 rounded-full peer-checked:bg-[#fe7743] transition-colors"></div>
+                <div class="absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition-transform peer-checked:translate-x-4"></div>
+              </label>
+            </td>
+            <td class="p-2">
+              <button 
+                class="w-6 h-6 bg-center bg-no-repeat bg-contain hover:scale-110 hover:opacity-80 transition-transform"
+                style="background-image: url('https://cdn-icons-png.flaticon.com/512/18/18297.png');">
+              </button>
+            </td>
+          </tr>
+          
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</body>
+</html>
