@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stockly - Registro</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Iconos de redes sociales -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="h-screen w-screen relative">
+
+  <!-- Imagen de fondo (TÚ agregas la URL) -->
+  <div class="absolute inset-0">
+    <img src="../../Imagenes_stockly/fondo_stockly.png" alt="Fondo almacén" class="w-full h-full object-cover">
+    <div class="absolute inset-0 bg-black bg-opacity-40"></div>
+  </div>
+
+  <!-- Contenedor principal -->
+  <div class="relative z-10 flex items-center justify-center h-full px-4">
+    <div class="w-full max-w-lg bg-[#F6FCFA] rounded-md shadow-lg p-8">
+
+
+      <!-- Título -->
+      <h2 class="text-center text-2xl font-semibold text-orange-600 mb-8">
+        Crear una cuenta
+      </h2>
+
+      <!-- Formulario de registro -->
+      <form class="space-y-4">
+        <!-- Nombre -->
+        <div>
+          <input 
+            type="text" 
+            placeholder="Nombre" 
+            class="w-full px-4 py-2 border border-blue-900 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+        </div>
+
+        <!-- Apellido -->
+        <div>
+          <input 
+            type="text" 
+            placeholder="Apellido" 
+            class="w-full px-4 py-2 border border-blue-900 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+        </div>
+
+        <!-- Número de Teléfono -->
+        <div>
+          <input 
+            type="tel" 
+            placeholder="Número de teléfono" 
+            class="w-full px-4 py-2 border border-blue-900 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+        </div>
+
+        <!-- Dirección -->
+        <div>
+          <input 
+            type="text" 
+            placeholder="Dirección" 
+            class="w-full px-4 py-2 border border-blue-900 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+        </div>
+
+        <!-- Contraseña -->
+        <div>
+          <input 
+            type="password" 
+            placeholder="Contraseña" 
+            class="w-full px-4 py-2 border border-blue-900 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+        </div>
+
+        <!-- Botón Registrar -->
+        <button 
+          type="submit" 
+          class="w-full bg-[#39728A] text-white py-2 rounded hover:bg-[#2f5f74] transition duration-300">
+          Registrar
+        </button>
+      </form>
+
+      <!-- Enlace para volver al login -->
+      <p class="text-center text-gray-600 text-sm mt-4">
+        ¿Ya tienes cuenta? 
+        <a href="login.html" class="text-orange-600 hover:underline">Inicia sesión aquí</a>
+      </p>
+    </div>
+  </div>
+</body>
+</html>
