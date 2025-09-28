@@ -14,10 +14,11 @@
   <!-- El main JS de la vista -->
   <script type="module" src="{{ url_for('static', filename='js/views/home.js') }}" defer></script>
 </head>
-<body class="min-h-screen bg-brandTeal text-white antialiased">
+<body class="min-h-screen bg-brandTeal text-white antialiased flex justify-center p-4">
 
+  <div class="w-full max-w-6xl bg-brandTeal rounded-lg p-4">
   <!-- Header -->
-  <header class="max-w-7xl mx-auto px-6 pt-8">
+  <header class="items-center mb-4 relative">
     <div class="flex items-center justify-between">
       <!-- Logo -->
         <a href="{{ url_for('main.home') }}">
@@ -29,11 +30,11 @@
       <!-- Nav -->
       <nav class="flex-1 flex justify-center">
         <ul class="inline-flex bg-white/90 text-black rounded-full px-6 py-2 gap-8 items-center shadow">
-          <li><a href="{{ url_for('main.home') }}" class="hover:underline">Inicio</a></li>
-          <li><a href="{{ url_for('main.inventario') }}" class="hover:underline">Inventario</a></li>
-          <li><a href="{{ url_for('main.pedidos') }}" class="hover:underline">Pedidos</a></li>
-          <li><a href="{{ url_for('main.reportes') }}" class="hover:underline">Reportes</a></li>
-          <li><a href="{{ url_for('main.cuenta') }}" class="font-semibold hover:underline">Cuenta</a></li>
+          <li><a href="{{ url_for('main.home') }}" class="text-black hover:text-brandOrange">Inicio</a></li>
+          <li><a href="{{ url_for('inventario.inventario') }}" class="text-black hover:text-brandOrange">Inventario</a></li>
+          <li><a href="{{ url_for('main.pedidos') }}" class="text-black hover:text-brandOrange">Pedidos</a></li>
+          <li><a href="{{ url_for('main.reportes') }}" class="text-black hover:text-brandOrange">Reportes</a></li>
+          <li><a href="{{ url_for('main.cuenta') }}" class="text-black hover:text-brandOrange">Cuenta</a></li>
         </ul>
       </nav>
 
@@ -61,7 +62,7 @@
     <!-- Columna derecha: Tarjetas 2x2 -->
     <aside class="md:col-span-1 grid grid-cols-2 gap-6 justify-items-center">
       <!-- Inventario -->
-      <a href="{{ url_for('main.inventario') }}" class="w-40 h-40 rounded-xl bg-brandOrange flex flex-col items-center justify-center shadow-lg transform hover:scale-105 transition">
+      <a href="{{ url_for('inventario.inventario') }}" class="w-40 h-40 rounded-xl bg-brandOrange flex flex-col items-center justify-center shadow-lg transform hover:scale-105 transition">
         <svg class="w-16 h-16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect x="7" y="4" width="10" height="14" rx="1.5" stroke="black" stroke-width="1.6" fill="none"></rect>
           <path d="M9 8h6" stroke="black" stroke-width="1.6" stroke-linecap="round"></path>
@@ -99,6 +100,8 @@
       </a>
     </aside>
   </main>
+
+  </div>
 
   <!-- Vue mostrará los textos -->
 </body>

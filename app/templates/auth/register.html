@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Stockly - Registro</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
   <!-- Iconos de redes sociales -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 </head>
@@ -12,7 +12,9 @@
 
   <!-- Imagen de fondo (TÚ agregas la URL) -->
   <div class="absolute inset-0">
-    <img src="../../Imagenes_stockly/fondo_stockly.png" alt="Fondo almacén" class="w-full h-full object-cover">
+    <img src="{{ url_for('static', filename='images/fondo_stockly.png') }}"
+         alt="Fondo almacén"
+         class="w-full h-full object-cover">
     <div class="absolute inset-0 bg-black bg-opacity-40"></div>
   </div>
 
@@ -22,12 +24,12 @@
 
 
       <!-- Título -->
-      <h2 class="text-center text-2xl font-semibold text-orange-600 mb-8">
+      <h2 class="text-center text-2xl font-semibold text-brandOrange mb-8 text-center">
         Crear una cuenta
       </h2>
 
       <!-- Formulario de registro -->
-      <form class="space-y-4">
+      <form method="POST" action="{{ url_for('auth.register') }}" class="space-y-4">
         <!-- Nombre -->
         <div>
           <input 
@@ -82,10 +84,12 @@
       </form>
 
       <!-- Enlace para volver al login -->
-      <p class="text-center text-gray-600 text-sm mt-4">
-        ¿Ya tienes cuenta? 
-        <a href="login.html" class="text-orange-600 hover:underline">Inicia sesión aquí</a>
-      </p>
+        <div class="w-full flex justify-center mt-6 mb-6">
+          <a href="{{ url_for('auth.login') }}" 
+             class="text-brandOrange font-medium hover:text-orange-700 hover:underline">
+            ¿Ya tienes cuenta? Inicia sesión aquí
+          </a>
+        </div>
     </div>
   </div>
 </body>

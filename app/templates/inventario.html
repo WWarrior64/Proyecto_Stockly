@@ -5,35 +5,40 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Inventario</title>
 
-  <!-- Tailwind CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Tailwind compilado localmente -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
-<body class="bg-[#447d9b] min-h-screen flex justify-center p-4">
+<body class="bg-brandTeal min-h-screen flex justify-center p-4">
 
-  <div class="w-full max-w-6xl bg-[#447d9b] rounded-lg p-4">
+  <div class="w-full max-w-6xl bg-brandTeal rounded-lg p-4">
     
     <!-- Header con Logo y Menú -->
-    <header class="flex justify-center items-center mb-4 relative">
-      <!-- Logo -->
-      <div 
-        class="absolute top-0 left-0 w-16 h-16 rounded-lg bg-center bg-contain bg-no-repeat"
-        style="background-image: url('../resources/Logo.png');">
-    </div>
+  <header class="items-center mb-4 relative">
 
-      <!-- Menú -->
-      <nav class="bg-white rounded-full px-9 py-4">
-        <ul class="flex gap-8">
-          <li><a href="#" class="text-black hover:text-[#fe7743]">Home</a></li>
-          <li><a href="#" class="text-[#fe7743]">Stock</a></li>
-          <li><a href="#" class="text-black hover:text-[#fe7743]">Pedidos</a></li>
-          <li><a href="#" class="text-black hover:text-[#fe7743]">Reportes</a></li>
-          <li><a href="#" class="text-black hover:text-[#fe7743]">Cuenta</a></li>
+    <div class="flex items-center justify-between">
+        <!-- Logo -->
+          <a href="{{ url_for('main.home') }}">
+              <img src="{{ url_for('static', filename='images/Logo_Stockly.png') }}" 
+                  alt="Logo Stockly"
+                  class="w-16 h-16 object-contain">
+          </a>
+
+      <!-- Nav -->
+      <nav class="flex-1 flex justify-center">
+        <ul class="inline-flex bg-white/90 text-black rounded-full px-6 py-2 gap-8 items-center shadow">
+          <li><a href="{{ url_for('main.home') }}" class="text-black hover:text-brandOrange">Inicio</a></li>
+          <li><a href="{{ url_for('inventario.inventario') }}" class="text-black hover:text-brandOrange">Inventario</a></li>
+          <li><a href="{{ url_for('main.pedidos') }}" class="text-black hover:text-brandOrange">Pedidos</a></li>
+          <li><a href="{{ url_for('main.reportes') }}" class="text-black hover:text-brandOrange">Reportes</a></li>
+          <li><a href="{{ url_for('main.cuenta') }}" class="text-black hover:text-brandOrange">Cuenta</a></li>
         </ul>
       </nav>
+        <div class="w-12"></div>
+    </div>
     </header>
 
     <!-- Barra superior: búsqueda y filtro -->
-    <div class="bg-white rounded-t-lg flex items-center p-3 gap-2">
+    <div class="max-w-7xl mx-auto px-6 mt-12 grid grid-cols-1 md:grid-cols-3 gap-8 bg-white rounded-t-lg flex items-center p-3 gap-2">
         <input type="text" placeholder="Buscar..." 
             class="border rounded-full px-3 py-1 text-sm outline-none">
         <button class="font-bold">Filtro</button>
@@ -54,11 +59,11 @@
           </tr>
         </thead>
         <tbody>
-          <!-- Producto ejemplo -->
+          <!-- Producto ejemplo (provisional) -->
           <tr class="border-b hover:bg-gray-50">
             <td class="p-2">
               <div class="w-10 h-10 bg-gray-300 rounded bg-center bg-contain bg-no-repeat"
-                   style="background-image: url('../resources/producto.png');">
+                  style="background-image: url('../../static/images/Producto.png');">
               </div>
             </td>
             <td class="p-2">Objeto en inventario por ser vendido</td>
@@ -69,7 +74,7 @@
               <!-- Switch -->
               <label class="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" class="sr-only peer" checked>
-                <div class="w-9 h-5 bg-gray-300 rounded-full peer-checked:bg-[#fe7743] transition-colors"></div>
+                <div class="w-9 h-5 bg-gray-300 rounded-full peer-checked:bg-brandOrange transition-colors"></div>
                 <div class="absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition-transform peer-checked:translate-x-4"></div>
               </label>
             </td>
@@ -85,7 +90,7 @@
           <tr class="border-b hover:bg-gray-50">
             <td class="p-2">
               <div class="w-10 h-10 bg-gray-300 rounded bg-center bg-contain bg-no-repeat"
-                   style="background-image: url('../resources/producto.png');">
+                   style="background-image: url('../../static/images/Producto.png');">
               </div>
             </td>
             <td class="p-2">Objeto en inventario por ser vendido</td>
@@ -96,7 +101,7 @@
               <!-- Switch -->
               <label class="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" class="sr-only peer" checked>
-                <div class="w-9 h-5 bg-gray-300 rounded-full peer-checked:bg-[#fe7743] transition-colors"></div>
+                <div class="w-9 h-5 bg-gray-300 rounded-full peer-checked:bg-brandOrange transition-colors"></div>
                 <div class="absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition-transform peer-checked:translate-x-4"></div>
               </label>
             </td>
@@ -112,7 +117,7 @@
           <tr class="border-b hover:bg-gray-50">
             <td class="p-2">
               <div class="w-10 h-10 bg-gray-300 rounded bg-center bg-contain bg-no-repeat"
-                   style="background-image: url('../resources/producto.png');">
+                   style="background-image: url('../../static/images/Producto.png');">
               </div>
             </td>
             <td class="p-2">Objeto en inventario por ser vendido</td>
@@ -123,7 +128,7 @@
               <!-- Switch -->
               <label class="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" class="sr-only peer" checked>
-                <div class="w-9 h-5 bg-gray-300 rounded-full peer-checked:bg-[#fe7743] transition-colors"></div>
+                <div class="w-9 h-5 bg-gray-300 rounded-full peer-checked:bg-brandOrange transition-colors"></div>
                 <div class="absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition-transform peer-checked:translate-x-4"></div>
               </label>
             </td>
@@ -139,7 +144,7 @@
           <tr class="border-b hover:bg-gray-50">
             <td class="p-2">
               <div class="w-10 h-10 bg-gray-300 rounded bg-center bg-contain bg-no-repeat"
-                   style="background-image: url('../resources/producto.png');">
+                  style="background-image: url('../../static/images/Producto.png');">
               </div>
             </td>
             <td class="p-2">Objeto en inventario por ser vendido</td>
@@ -150,7 +155,7 @@
               <!-- Switch -->
               <label class="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" class="sr-only peer" checked>
-                <div class="w-9 h-5 bg-gray-300 rounded-full peer-checked:bg-[#fe7743] transition-colors"></div>
+                <div class="w-9 h-5 bg-gray-300 rounded-full peer-checked:bg-brandOrange transition-colors"></div>
                 <div class="absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition-transform peer-checked:translate-x-4"></div>
               </label>
             </td>
@@ -163,10 +168,12 @@
             </td>
           </tr>
 
-          <!-- Repite este bloque para más productos -->
+          <!-- Repitir este bloque para más productos -->
           <tr class="border-b hover:bg-gray-50">
             <td class="p-2">
-              <div class="w-10 h-10 bg-gray-300 rounded bg-center bg-contain bg-no-repeat"></div>
+              <div class="w-10 h-10 bg-gray-300 rounded bg-center bg-contain bg-no-repeat"
+                   style="background-image: url('../../static/images/Producto.png');">
+              </div>
             </td>
             <td class="p-2">Objeto en inventario por ser vendido</td>
             <td class="p-2">Categoría</td>
@@ -175,7 +182,7 @@
             <td class="p-2">
               <label class="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" class="sr-only peer">
-                <div class="w-9 h-5 bg-gray-300 rounded-full peer-checked:bg-[#fe7743] transition-colors"></div>
+                <div class="w-9 h-5 bg-gray-300 rounded-full peer-checked:bg-brandOrange transition-colors"></div>
                 <div class="absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition-transform peer-checked:translate-x-4"></div>
               </label>
             </td>
