@@ -5,7 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Reportes - Estadísticas</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-  
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* Limitar altura de los gráficos */
+    .chart-container {
+      width: 100%;
+      height: 220px; /* ajusta aquí según tu pantalla */
+    }
+  </style>
 </head>
 <body class="bg-brandTeal min-h-screen flex justify-center p-4">
 
@@ -45,36 +52,36 @@
       </div>
 
       <!-- Bloques principales -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <!-- Indicadores -->
-        <div class="space-y-6">
+        <div class="space-y-4">
           <div class="flex items-center gap-4">
-            <div class="w-14 h-14 rounded-full border-4 border-brandTeal flex items-center justify-center font-bold text-brandTeal">91%</div>
-            <span class="text-lg font-semibold">80%</span>
+            <div class="w-12 h-12 rounded-full border-4 border-brandTeal flex items-center justify-center font-bold text-brandTeal text-sm">91%</div>
+            <span class="text-sm font-semibold">80%</span>
           </div>
           <div class="flex items-center gap-4">
-            <div class="w-14 h-14 rounded-full border-4 border-orange-300 flex items-center justify-center font-bold text-orange-400">45%</div>
-            <span class="text-lg font-semibold">15.635</span>
+            <div class="w-12 h-12 rounded-full border-4 border-orange-300 flex items-center justify-center font-bold text-orange-400 text-sm">45%</div>
+            <span class="text-sm font-semibold">15.635</span>
           </div>
           <div class="flex items-center gap-4">
-            <div class="w-14 h-14 rounded-full border-4 border-orange-500 flex items-center justify-center font-bold text-orange-500">67%</div>
-            <span class="text-lg font-semibold">4 Años</span>
+            <div class="w-12 h-12 rounded-full border-4 border-orange-500 flex items-center justify-center font-bold text-orange-500 text-sm">67%</div>
+            <span class="text-sm font-semibold">4 Años</span>
           </div>
         </div>
 
         <!-- Gráfico de dona -->
-        <div>
+        <div class="chart-container">
           <canvas id="donutChart"></canvas>
         </div>
 
         <!-- Gráfico de barras -->
-        <div>
+        <div class="chart-container">
           <canvas id="barChart"></canvas>
         </div>
       </div>
 
       <!-- Gráfico de líneas -->
-      <div>
+      <div class="chart-container">
         <canvas id="lineChart"></canvas>
       </div>
     </div>
@@ -82,8 +89,7 @@
 
   <!-- Scripts de Chart.js -->
   <script>
-    // Donut
-    new Chart(document.getElementById('donutChart'), {
+    const donutChart = new Chart(document.getElementById('donutChart'), {
       type: 'doughnut',
       data: {
         labels: ['Elemento 1', 'Elemento 2', 'Elemento 3', 'Elemento 4', 'Elemento 5'],
@@ -91,11 +97,13 @@
           data: [20, 20, 20, 20, 20],
           backgroundColor: ['#3B82F6', '#F59E0B', '#10B981', '#EF4444', '#9CA3AF']
         }]
+      },
+      options: {
+        maintainAspectRatio: false
       }
     });
 
-    // Barras
-    new Chart(document.getElementById('barChart'), {
+    const barChart = new Chart(document.getElementById('barChart'), {
       type: 'bar',
       data: {
         labels: ['Serie 1', 'Serie 2', 'Serie 3'],
@@ -108,11 +116,13 @@
           data: [8, 14, 18],
           backgroundColor: '#F59E0B'
         }]
+      },
+      options: {
+        maintainAspectRatio: false
       }
     });
 
-    // Líneas
-    new Chart(document.getElementById('lineChart'), {
+    const lineChart = new Chart(document.getElementById('lineChart'), {
       type: 'line',
       data: {
         labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
@@ -127,6 +137,9 @@
           borderColor: '#F59E0B',
           fill: false
         }]
+      },
+      options: {
+        maintainAspectRatio: false
       }
     });
   </script>
