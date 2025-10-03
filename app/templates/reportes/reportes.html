@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reportes - Estadísticas</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  
+</head>
+<body class="bg-brandTeal min-h-screen flex justify-center p-4">
+
+  <div class="w-full max-w-6xl bg-brandTeal rounded-lg p-4">
+    
+    <!-- Header -->
+    <header class="items-center mb-4 relative">
+      <div class="flex items-center justify-between">
+        <!-- Logo -->
+        <a href="{{ url_for('main.home') }}">
+          <img src="{{ url_for('static', filename='images/Logo_Stockly.png') }}" 
+               alt="Logo Stockly"
+               class="w-16 h-16 object-contain">
+        </a>
+
+        <!-- Nav -->
+        <nav class="flex-1 flex justify-center">
+          <ul class="inline-flex bg-white/90 text-black rounded-full px-6 py-2 gap-8 items-center shadow">
+            <li><a href="{{ url_for('main.home') }}" class="text-black hover:text-brandOrange">Home</a></li>
+            <li><a href="{{ url_for('inventario.inventario') }}" class="text-black hover:text-brandOrange">Stock</a></li>
+            <li><a href="{{ url_for('main.pedidos') }}" class="text-black hover:text-brandOrange">Pedidos</a></li>
+            <li><a href="{{ url_for('main.reportes') }}" class="text-brandOrange font-bold">Reportes</a></li>
+            <li><a href="{{ url_for('main.cuenta') }}" class="text-black hover:text-brandOrange">Cuenta</a></li>
+          </ul>
+        </nav>
+        <div class="w-12"></div>
+      </div>
+    </header>
+
+    <!-- Contenido de estadísticas -->
+    <div class="bg-white rounded-lg p-6">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-3xl font-bold text-gray-800">Estadísticas</h2>
+        <button class="bg-brandOrange text-white px-4 py-2 rounded-full font-semibold hover:opacity-80 transition">
+          Descargar
+        </button>
+      </div>
+
+      <!-- Bloques principales -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <!-- Indicadores -->
+        <div class="space-y-6">
+          <div class="flex items-center gap-4">
+            <div class="w-14 h-14 rounded-full border-4 border-brandTeal flex items-center justify-center font-bold text-brandTeal">91%</div>
+            <span class="text-lg font-semibold">80%</span>
+          </div>
+          <div class="flex items-center gap-4">
+            <div class="w-14 h-14 rounded-full border-4 border-orange-300 flex items-center justify-center font-bold text-orange-400">45%</div>
+            <span class="text-lg font-semibold">15.635</span>
+          </div>
+          <div class="flex items-center gap-4">
+            <div class="w-14 h-14 rounded-full border-4 border-orange-500 flex items-center justify-center font-bold text-orange-500">67%</div>
+            <span class="text-lg font-semibold">4 Años</span>
+          </div>
+        </div>
+
+        <!-- Gráfico de dona -->
+        <div>
+          <canvas id="donutChart"></canvas>
+        </div>
+
+        <!-- Gráfico de barras -->
+        <div>
+          <canvas id="barChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Gráfico de líneas -->
+      <div>
+        <canvas id="lineChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts de Chart.js -->
+  <script>
+    // Donut
+    new Chart(document.getElementById('donutChart'), {
+      type: 'doughnut',
+      data: {
+        labels: ['Elemento 1', 'Elemento 2', 'Elemento 3', 'Elemento 4', 'Elemento 5'],
+        datasets: [{
+          data: [20, 20, 20, 20, 20],
+          backgroundColor: ['#3B82F6', '#F59E0B', '#10B981', '#EF4444', '#9CA3AF']
+        }]
+      }
+    });
+
+    // Barras
+    new Chart(document.getElementById('barChart'), {
+      type: 'bar',
+      data: {
+        labels: ['Serie 1', 'Serie 2', 'Serie 3'],
+        datasets: [{
+          label: 'Serie A',
+          data: [5, 10, 15],
+          backgroundColor: '#3B82F6'
+        },{
+          label: 'Serie B',
+          data: [8, 14, 18],
+          backgroundColor: '#F59E0B'
+        }]
+      }
+    });
+
+    // Líneas
+    new Chart(document.getElementById('lineChart'), {
+      type: 'line',
+      data: {
+        labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
+        datasets: [{
+          label: 'Serie A',
+          data: [5, 20, 12, 16, 9, 6],
+          borderColor: '#3B82F6',
+          fill: false
+        },{
+          label: 'Serie B',
+          data: [4, 12, 15, 18, 7, 14],
+          borderColor: '#F59E0B',
+          fill: false
+        }]
+      }
+    });
+  </script>
+
+</body>
+</html>
