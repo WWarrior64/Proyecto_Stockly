@@ -21,7 +21,7 @@
   <header class="items-center mb-4 relative">
     <div class="flex items-center justify-between">
       <!-- Logo -->
-        <a href="{{ url_for('main.home') }}">
+        <a href="{{ url_for('main.home') }}" class="flex items-center gap-3">
             <img src="{{ url_for('static', filename='images/Logo_Stockly.png') }}" 
                 alt="Logo Stockly"
                 class="w-16 h-16 object-contain">
@@ -30,11 +30,11 @@
       <!-- Nav -->
       <nav class="flex-1 flex justify-center">
         <ul class="inline-flex bg-white/90 text-black rounded-full px-6 py-2 gap-8 items-center shadow">
-          <li><a href="{{ url_for('main.home') }}" class="text-black hover:text-brandOrange">Inicio</a></li>
+          <li><a href="{{ url_for('main.home') }}" class="font-semibold text-brandOrange">Inicio</a></li>
           <li><a href="{{ url_for('inventario.inventario') }}" class="text-black hover:text-brandOrange">Inventario</a></li>
           <li><a href="{{ url_for('main.pedidos') }}" class="text-black hover:text-brandOrange">Pedidos</a></li>
           <li><a href="{{ url_for('main.reportes') }}" class="text-black hover:text-brandOrange">Reportes</a></li>
-          <li><a href="{{ url_for('main.cuenta') }}" class="text-black hover:text-brandOrange">Cuenta</a></li>
+          <li><a href="{{ url_for('cuenta.cuenta') }}" class="text-black hover:text-brandOrange">Cuenta</a></li>
         </ul>
       </nav>
 
@@ -91,7 +91,7 @@
       </a>
 
       <!-- Cuenta -->
-      <a href="{{ url_for('main.cuenta') }}" class="w-40 h-40 rounded-xl bg-brandOrange flex flex-col items-center justify-center shadow-lg transform hover:scale-105 transition">
+      <a href="{{ url_for('cuenta.cuenta') }}" class="w-40 h-40 rounded-xl bg-brandOrange flex flex-col items-center justify-center shadow-lg transform hover:scale-105 transition">
         <svg class="w-16 h-16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <circle cx="12" cy="8" r="3.2" stroke="black" stroke-width="1.6" fill="none"></circle>
           <path d="M5 20c1.5-3 4.5-4 7-4s5.5 1 7 4" stroke="black" stroke-width="1.6" stroke-linecap="round"></path>
