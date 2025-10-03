@@ -12,4 +12,4 @@ def pedidos():
 
 @main_bp.route('/reportes')
 def reportes():
-    return render_template('reportes.html')
+    return render_template('reportes/reportes.html')
