@@ -13,7 +13,3 @@ def pedidos():
 @main_bp.route('/reportes')
 def reportes():
     return render_template('reportes.html')
-
-@main_bp.route('/cuenta')
-def cuenta():
-    return render_template('cuenta.html')
