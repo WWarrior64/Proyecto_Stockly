@@ -32,8 +32,8 @@
         <ul class="inline-flex bg-white/90 text-black rounded-full px-6 py-2 gap-8 items-center shadow">
           <li><a href="{{ url_for('main.home') }}" class="font-semibold text-brandOrange">Inicio</a></li>
           <li><a href="{{ url_for('inventario.inventario') }}" class="text-black hover:text-brandOrange">Inventario</a></li>
-          <li><a href="{{ url_for('main.pedidos') }}" class="text-black hover:text-brandOrange">Pedidos</a></li>
-          <li><a href="{{ url_for('main.reportes') }}" class="text-black hover:text-brandOrange">Reportes</a></li>
+          <li><a href="{{ url_for('pedidos.pedidos') }}" class="text-black hover:text-brandOrange">Pedidos</a></li>
+          <li><a href="{{ url_for('reportes.reportes') }}" class="text-black hover:text-brandOrange">Reportes</a></li>
           <li><a href="{{ url_for('cuenta.cuenta') }}" class="text-black hover:text-brandOrange">Cuenta</a></li>
         </ul>
       </nav>
@@ -72,7 +72,7 @@
       </a>
 
       <!-- Pedidos -->
-      <a href="{{ url_for('main.pedidos') }}" class="w-40 h-40 rounded-xl bg-white flex flex-col items-center justify-center shadow-lg transform hover:scale-105 transition">
+      <a href="{{ url_for('pedidos.pedidos') }}" class="w-40 h-40 rounded-xl bg-white flex flex-col items-center justify-center shadow-lg transform hover:scale-105 transition">
         <svg class="w-16 h-16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M3 3h2l1.6 9h11.8l1.6-6H8" stroke="black" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
           <circle cx="10" cy="20" r="1.4" fill="black"></circle>
@@ -82,7 +82,7 @@
       </a>
 
       <!-- Reportes -->
-      <a href="{{ url_for('main.reportes') }}" class="w-40 h-40 rounded-xl bg-white flex flex-col items-center justify-center shadow-lg transform hover:scale-105 transition">
+      <a href="{{ url_for('reportes.reportes') }}" class="w-40 h-40 rounded-xl bg-white flex flex-col items-center justify-center shadow-lg transform hover:scale-105 transition">
         <svg class="w-16 h-16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect x="5" y="4" width="14" height="16" rx="2" stroke="black" stroke-width="1.6" fill="none"></rect>
           <path d="M8 8h8M8 12h5M8 16h3" stroke="black" stroke-width="1.6" stroke-linecap="round"></path>

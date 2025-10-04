@@ -4,15 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Reportes - Estadísticas</title>
+  <!-- Tailwind compilado localmente -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+
+  <!-- Chart.js (CDN) -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    /* Limitar altura de los gráficos */
-    .chart-container {
-      width: 100%;
-      height: 220px; /* ajusta aquí según tu pantalla */
-    }
-  </style>
+
 </head>
 <body class="bg-brandTeal min-h-screen flex justify-center p-4">
 
@@ -31,11 +28,11 @@
         <!-- Nav -->
         <nav class="flex-1 flex justify-center">
           <ul class="inline-flex bg-white/90 text-black rounded-full px-6 py-2 gap-8 items-center shadow">
-            <li><a href="{{ url_for('main.home') }}" class="text-black hover:text-brandOrange">Home</a></li>
-            <li><a href="{{ url_for('inventario.inventario') }}" class="text-black hover:text-brandOrange">Stock</a></li>
-            <li><a href="{{ url_for('main.pedidos') }}" class="text-black hover:text-brandOrange">Pedidos</a></li>
-            <li><a href="{{ url_for('main.reportes') }}" class="text-brandOrange font-bold">Reportes</a></li>
-            <li><a href="{{ url_for('main.cuenta') }}" class="text-black hover:text-brandOrange">Cuenta</a></li>
+            <li><a href="{{ url_for('main.home') }}" class="text-black hover:text-brandOrange">Inicio</a></li>
+            <li><a href="{{ url_for('inventario.inventario') }}" class="text-black hover:text-brandOrange">Inventario</a></li>
+            <li><a href="{{ url_for('pedidos.pedidos') }}" class="text-black hover:text-brandOrange">Pedidos</a></li>
+            <li><a href="{{ url_for('reportes.reportes') }}" class="text-brandOrange font-bold">Reportes</a></li>
+            <li><a href="{{ url_for('cuenta.cuenta') }}" class="text-black hover:text-brandOrange">Cuenta</a></li>
           </ul>
         </nav>
         <div class="w-12"></div>

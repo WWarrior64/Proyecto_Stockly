@@ -4,6 +4,8 @@ from app.routes.main import main_bp
 from app.routes.auth import auth_bp
 from app.routes.inventario import inventario_bp
 from app.routes.cuenta import cuenta_bp
+from app.routes.pedidos import pedidos_bp
+from app.routes.reportes import reportes_bp
 
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))   # carpeta donde está el archivo app.py
@@ -19,6 +21,8 @@ app.register_blueprint(main_bp)
 app.register_blueprint(auth_bp)
 app.register_blueprint(inventario_bp)
 app.register_blueprint(cuenta_bp)
+app.register_blueprint(pedidos_bp)
+app.register_blueprint(reportes_bp)
 
 
 @app.route("/")
