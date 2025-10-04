@@ -4,4 +4,4 @@ inventario_bp = Blueprint('inventario', __name__, url_prefix="/inventario")
 
 @inventario_bp.route('/')
 def inventario():
-    return render_template('inventario.html')
+    return render_template('inventario/inventario.html')

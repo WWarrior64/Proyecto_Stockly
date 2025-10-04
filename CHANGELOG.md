@@ -20,6 +20,58 @@ Cada entrada contiene, de forma estructurada:
 
 ---
 
+## [0.3.0] - 04-10-2025
+- **Versión:** 0.3.0
+- **Fecha:** 04-10-2025
+- **Descripción:** Inclusión de vistas y funcionalidades principales de UI enfocadas en Pedidos, Reportes y Perfil de Usuario; reorganización de rutas y assets; integración de Vue.js en el front-end y Chart.js para visualización de datos:
+  - Implementación completa de la interfaz de **Reportes** con Chart.js y Tailwind. (PR #7)
+  - Creación de la vista de **Pedidos** con Tailwind. (PR #6)
+  - Implementación de la página de **Perfil de Usuario** usando Vue.js y Tailwind, con `userService` para consumo de endpoints API. (PR #5)
+  - Se añadieron blueprints separados para `pedidos` y `reportes` (separación de responsabilidades en rutas).
+  - Tailwind ahora se usa compilado localmente y los templates apuntan a `static/css/styles.css` (en lugar de usar CDN en producción).
+  - Ajustes en `app.py` para registrar correctamente los nuevos blueprints (`pedidos_bp`, `reportes_bp`, `cuenta_bp`), y correcciones en `main.py` para evitar rutas duplicadas/colisiones.
+- **Impacto:**
+  - **Nuevo:** Vistas funcionales para Pedidos, Reportes y Perfil (frontend listo para iterar; backend DB pendiente).
+  - **Mejora:** Código más modular (blueprints por dominio), paleta y estilos unificados a través del proyecto.
+  - **Operacional:** Preparación para compilar Tailwind localmente (scripts `dev:css` / `build:css`), y punto de partida para enlazar la lógica del backend (endpoints API) con Vue en el frontend.
+
+### Detalle
+#### Added
+- Vistas:
+  - `templates/pedidos/pedidos.html` (UI de lista de pedidos, búsqueda, filtros y switches accesibles).
+  - `templates/reportes/reportes.html` (dashboard de estadísticas con Chart.js).
+  - `templates/user/usuario.html` (perfil de usuario con montaje vía Vue).
+- Blueprints:
+  - `app/routes/pedidos.py` (pedidos_bp) con endpoints CRUD-stub: `/pedidos/`, `/pedidos/crear`, `/pedidos/<id>`, etc.
+  - `app/routes/reportes.py` (reportes_bp) con endpoint `/reportes/`.
+  - `app/routes/cuenta.py` (cuenta_bp) (API `/cuenta/api/user` y vistas de usuario).
+- Frontend (JS/CSS):
+  - `static/js/services/userService.js` (fetch a `/cuenta/api/user`, logout stub).
+  - `static/js/views/user.js` (Vue app para perfil).
+  - `static/css/styles.css` (Tailwind compilado localmente).
+- Assets:
+  - Imágenes movidas/añadidas en `static/images/` (logos, producto, fondo, avatar placeholder, filter icon).
+
+#### Changed
+- Rutas y estructura:
+  - Eliminadas las rutas `/pedidos` y `/reportes` del blueprint `main` para crear blueprints independientes y evitar colisiones de endpoints.
+  - `main.py` limpiado de rutas duplicadas (se dejó `home` y rutas no relacionadas a pedidos/reportes).
+- Tailwind:
+  - Reemplazo del uso de CDN por el CSS generado localmente (`static/css/styles.css`).
+  - Inclusión de variables de tema extendidas en `tailwind.config.js` (colores: `brandTeal`, `brandOrange`).
+- Templates:
+  - Todos los templates principales actualizados para usar `url_for('static', filename='css/styles.css')` y `url_for('static', filename='images/…')`.
+  - Enlaces en nav actualizados para apuntar a endpoints de blueprints (`url_for('pedidos.pedidos')`, `url_for('reportes.reportes')`, `url_for('cuenta.cuenta')`).
+- app.py:
+  - Registro de los nuevos blueprints (`pedidos_bp`, `reportes_bp`, `cuenta_bp`) y mantenimiento de `main_bp`, `auth_bp`.
+
+#### Fixed
+- Correcciones a `url_for` en templates que producían `BuildError` (uso correcto del nombre del endpoint según blueprint y url_prefix).
+- Mejora en accesibilidad de los switches (atributos `aria-*` añadidos).
+- Corrección de paths rotos por el reubicado de assets (actualizados a `static/images/...`).
+
+---
+
 ## [0.2.0] - 28-09-2025
 - **Versión:** 0.2.0
 - **Fecha:** 28-09-2025
