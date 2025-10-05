@@ -1,4 +1,6 @@
 # app/routes/cuenta.py
+from app.models.usuario import Usuario
+from app.extensions import db
 from flask import Blueprint, render_template, jsonify, request, redirect, url_for
 
 # usamos url_prefix para que todas las rutas queden bajo /cuenta
