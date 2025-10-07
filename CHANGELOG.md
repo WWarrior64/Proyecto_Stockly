@@ -20,6 +20,99 @@ Cada entrada contiene, de forma estructurada:
 
 ---
 
+## [0.4.0] - 07-10-2025
+- **Versión:** 0.4.0  
+- **Fecha:** 07-10-2025  
+- **Descripción:** Implementación completa del backend con base de datos, autenticación segura mediante Flask-Login, controladores MVC, gestión de sesión, vistas de usuario, sistema de mensajes flash y modularización de blueprints. Incluye la conexión a la base de datos real, registro e inicio de sesión funcionales, cierre de sesión, control de acceso, y la integración de vistas dinámicas en Tailwind y Vue.  
+- **Impacto:**
+  - **Nuevo:** Backend totalmente operativo (login, registro, logout, sesión persistente).
+  - **Mejora:** Estructura modular lista para escalar; código dividido en controladores, modelos y rutas.
+  - **Operacional:** El sistema requiere `SECRET_KEY` y `DATABASE_URL` definidos en `.env`.
+
+### Detalle
+
+#### Added
+
+**Base de datos y configuración**
+- Conexión a MySQL/MariaDB funcional a través de `SQLALCHEMY_DATABASE_URI` (en `.env`).
+- Implementación de `app/extensions.py` para inicializar `db`, `migrate` y `login_manager`.
+- Migraciones gestionadas con Flask-Migrate.
+
+**Modelos**
+- `Usuario`: incluye herencia de `UserMixin` y método `get_id()` compatible con Flask-Login.
+- `Rol`: tabla de roles asociada con usuarios.
+- Relaciones establecidas con claves foráneas (`rol_id` en `Usuario`).
+
+**Autenticación y sesión**
+- Integración completa de Flask-Login:
+  - Uso de `login_user()` y `logout_user()` en rutas.
+  - Decorador `@login_required` en vistas protegidas.
+  - Cargador de usuario `@login_manager.user_loader`.
+- Hash de contraseñas con `werkzeug.security.generate_password_hash` y verificación con `check_password_hash`.
+- Manejo de sesión a través del objeto `current_user`.
+
+**Controladores**
+- `auth_controller.py`:
+  - `registrar_usuario(form_data)` crea usuarios con contraseña encriptada.
+  - `autenticar_usuario(email, password)` valida credenciales.
+- Nuevo `cuenta_controller.py`:
+  - Permite obtener y mostrar datos del usuario autenticado.
+  - Preparado para futuras actualizaciones del perfil.
+
+**Rutas (Blueprints)**
+- `auth_bp`: rutas `/login`, `/register`, `/logout`.
+- `cuenta_bp`: vista del usuario (`/cuenta`) y endpoints para datos de perfil.
+- `pedidos_bp` y `reportes_bp` actualizados y registrados en `app.py`.
+- Redirección raíz `/` → `/auth/login`.
+
+**Vistas**
+- `login.html` y `register.html`: diseño responsivo con Tailwind y mensajes flash integrados.
+- `usuario.html`: vista moderna con Vue.js, muestra datos del usuario actual y botón “Cerrar sesión”.
+- `partials/_flash.html`: componente reutilizable para mensajes de estado (success, warning, error).
+- Animaciones de desaparición automática implementadas en `static/js/flash.js`.
+
+**Frontend**
+- Tailwind compilado localmente, sin dependencias de CDN.
+- Flash messages estilizados con clases dinámicas (verde, amarillo, rojo).
+- Vue.js usado para el renderizado reactivo de datos del usuario (`user.js`).
+- Navegación coherente entre vistas (Inicio, Inventario, Pedidos, Reportes, Cuenta).
+
+**Seguridad**
+- Claves sensibles (`SECRET_KEY`, `DATABASE_URL`) movidas a `.env`.
+- Contraseñas encriptadas antes de almacenarse.
+- Control de acceso mediante `login_required`.
+
+**Co-autores**
+- Co-authored-by: Jorge_castro1 <jorge.castro1@catolica.edu.sv>  
+- Co-authored-by: elvis-chavez <elvis.chavez@catolica.edu.sv>
+
+#### Changed
+- `app.py` reorganizado:
+  - Registro centralizado de todos los blueprints (`auth`, `main`, `inventario`, `cuenta`, `pedidos`, `reportes`).
+  - Configuración de carpetas `static` y `templates` fuera de `app/` para compatibilidad.
+- `Usuario` actualizado para integrar `UserMixin` y relación con `Rol`.
+- `auth.py` refactorizado:
+  - Eliminadas sesiones manuales (`session['user_id']`).
+  - Reemplazo por `login_user()` y `logout_user()`.
+- `login.html` y `register.html`:
+  - Integrados mensajes flash dinámicos (`get_flashed_messages`).
+  - Correcciones visuales de alineación y espaciado.
+- `flash.js` modificado para animar correctamente tras los cambios de layout (fixed + right-4).
+
+#### Fixed
+- Errores de conexión MySQL (No such file or directory) corregidos mediante variables `.env` adecuadas.
+- Problemas de alineación de mensajes flash (posición corregida y animación restaurada).
+- Mensajes flash ahora desaparecen automáticamente tras 5s sin romper la estructura del layout.
+- Vista de usuario actualizada para centrar correctamente el nombre y el avatar.
+- `url_for` corregido en múltiples templates para usar endpoints de blueprints.
+- Eliminados espacios en blanco y problemas de padding en layouts principales.
+
+#### Removed
+- Manejo de sesión manual vía `session[]` en favor de Flask-Login.
+- Código redundante en rutas de `auth` y templates.
+
+---
+
 ## [0.3.0] - 04-10-2025
 - **Versión:** 0.3.0
 - **Fecha:** 04-10-2025

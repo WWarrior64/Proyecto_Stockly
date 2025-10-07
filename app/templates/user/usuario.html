@@ -45,16 +45,17 @@
     <main id="vm" class="max-w-7xl mx-auto px-6 mt-8">
       <div class="bg-white/95 rounded-2xl p-8 grid grid-cols-1 md:grid-cols-3 gap-6 items-start shadow-lg">
         <!-- Avatar + nombre (izquierda) -->
-        <div class="flex flex-col items-center md:items-start md:col-span-1">
+        <!-- Centrado siempre -->
+        <div class="flex flex-col items-center md:col-span-1">
           <div class="w-56 h-56 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden shadow-md">
-            <!-- imagen del avatar; si no hay, se muestra placeholder -->
             <img :src="user.avatar || '{{ url_for('static', filename='images/avatar_placeholder.png') }}'"
-                 alt="Avatar"
-                 class="w-full h-full object-cover">
+                alt="Avatar"
+                class="w-full h-full object-cover">
           </div>
 
-          <h2 class="mt-6 text-2xl font-semibold text-gray-800">[[ user.fullName ]]</h2>
+          <h2 class="mt-6 text-2xl font-semibold text-gray-800 text-center">[[ user.fullName ]]</h2>
         </div>
+
 
         <!-- Detalles (derecha) -->
         <section class="md:col-span-2">
