@@ -13,20 +13,20 @@ const app = Vue.createApp({
         phone: '',
         avatar: '',
         extraFields: []
-      }
+      },
+      loading: true
     };
   },
-  created() {
-    // usar then() o async/await para asignar datos reales
-    userService.getUser().then(data => {
-      this.user = data;
-    }).catch(err => {
-      console.error('Error al cargar usuario:', err);
-    });
+  async created() {
+    this.loading = true;
+    const data = await userService.getUser();
+    this.user = data;
+    this.loading = false;
   },
   methods: {
-    logout() {
-      userService.logout();
+    async logout() {
+      await userService.logout();
+      // userService.logout() redirige al login
     }
   }
 });
