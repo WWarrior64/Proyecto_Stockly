@@ -1,6 +1,7 @@
 from app.models.usuario import Usuario
 from app.extensions import db
 from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy.exc import IntegrityError
 
 def registrar_usuario(form_data):
     contrasena_hash = generate_password_hash(form_data['contrasena'], method='scrypt')

@@ -1,6 +1,7 @@
 from app.extensions import db
+from flask_login import UserMixin
 
-class Usuario(db.Model):
+class Usuario(db.Model, UserMixin):
     __tablename__ = 'Usuario'  # Debe coincidir exactamente con el nombre de la tabla en MySQL
 
     usuario_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -16,3 +17,9 @@ class Usuario(db.Model):
 
     def __repr__(self):
         return f"<Usuario {self.nombre} {self.apellido}>"
+
+    # UserMixin ya agrega is_authenticated, is_active, is_anonymous y get_id()
+    # pero se puede definir get_id explícitamente si queremos asegurar el tipo:
+    def get_id(self):
+        # Flask-Login espera un identificador unicode/str
+        return str(self.usuario_id)

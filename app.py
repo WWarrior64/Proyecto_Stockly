@@ -7,9 +7,10 @@ from app.routes.cuenta import cuenta_bp
 from app.routes.pedidos import pedidos_bp
 from app.routes.reportes import reportes_bp
 from config import Config
-from app.extensions import db, migrate
-from app.models import Usuario, Rol, Producto
+from app.models import Usuario, Rol, Producto # Importa otros modelos según sea necesario #Importa el modelo aquí para evitar ciclos al inicio del módulo
+from app.extensions import db, migrate, login_manager
 
+# Configuración de rutas para archivos estáticos y plantillas
 
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))   # carpeta donde está el archivo app.py
@@ -27,6 +28,20 @@ app.config.from_object(Config)
 db.init_app(app)
 migrate.init_app(app, db)
 
+# Inicializar Flask-Login
+login_manager.init_app(app)
+login_manager.login_view = "auth.login"
+
+#-------------------------------------------------------------------------------
+@login_manager.user_loader
+def load_user(user_id):
+    if not user_id:
+        return None
+    try:
+        return Usuario.query.get(int(user_id))
+    except Exception:
+        return None
+#------------------------------------------------------------------------------
 
 app.register_blueprint(main_bp)
 app.register_blueprint(auth_bp)
