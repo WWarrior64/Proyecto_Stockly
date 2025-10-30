@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Proveedores</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#4f7b91] flex flex-col items-center p-8 font-sans">
+
+  <!-- Contenedor principal -->
+  <div class="bg-[#f5f9f8] w-11/12 md:w-4/5 rounded-2xl p-8 shadow-lg">
+    
+    <!-- Botón Crear -->
+    <a href="crear_proveedores.html" 
+   class="bg-orange-500 text-white px-5 py-2 rounded-full shadow hover:bg-orange-600 transition">
+  + Crear proveedor
+</a>
+
+    <!-- Tabla -->
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-separate border-spacing-y-2">
+        <thead class="bg-[#e9f0ef]">
+          <tr>
+            <th class="py-3 px-4 rounded-l-lg">No.</th>
+            <th class="py-3 px-4">Nombre</th>
+            <th class="py-3 px-4">Empresa</th>
+            <th class="py-3 px-4">Teléfono</th>
+            <th class="py-3 px-4 rounded-r-lg">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white">
+          <tr class="hover:bg-gray-50 border-b">
+            <td class="py-3 px-4">001</td>
+            <td class="py-3 px-4">Proveedor A</td>
+            <td class="py-3 px-4">Distribuciones S.A.</td>
+            <td class="py-3 px-4">1234-5678</td>
+            <td class="py-3 px-4 flex space-x-3">
+              <button title="Editar" class="text-blue-500 hover:text-blue-700">✏️</button>
+              <button title="Eliminar" class="text-red-500 hover:text-red-700">🗑️</button>
+            </td>
+          </tr>
+          <tr class="hover:bg-gray-50 border-b">
+            <td class="py-3 px-4">002</td>
+            <td class="py-3 px-4">Proveedor B</td>
+            <td class="py-3 px-4">Comercial ABC</td>
+            <td class="py-3 px-4">8765-4321</td>
+            <td class="py-3 px-4 flex space-x-3">
+              <button title="Editar" class="text-blue-500 hover:text-blue-700">✏️</button>
+              <button title="Eliminar" class="text-red-500 hover:text-red-700">🗑️</button>
+            </td>
+          </tr>
+          <tr class="hover:bg-gray-50">
+            <td class="py-3 px-4">003</td>
+            <td class="py-3 px-4">Proveedor C</td>
+            <td class="py-3 px-4">Global Suministros</td>
+            <td class="py-3 px-4">7890-6543</td>
+            <td class="py-3 px-4 flex space-x-3">
+              <button title="Editar" class="text-blue-500 hover:text-blue-700">✏️</button>
+              <button title="Eliminar" class="text-red-500 hover:text-red-700">🗑️</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+</body>
+</html>
