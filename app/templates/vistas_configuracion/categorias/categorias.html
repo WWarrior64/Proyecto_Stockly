@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Categorías</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#4f7b91] flex flex-col items-center p-8 font-sans">
+
+  <!-- Contenedor principal -->
+  <div class="bg-[#f5f9f8] w-11/12 md:w-4/5 rounded-2xl p-8 shadow-lg">
+
+    <!-- Botón Crear -->
+    <div class="flex justify-start mb-6">
+      <a href="crear_formulario.html" 
+         class="bg-orange-500 text-white px-5 py-2 rounded-full shadow hover:bg-orange-600 transition">
+        + Crear categoría
+      </a>
+    </div>
+
+    <!-- Tabla -->
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-separate border-spacing-y-2">
+        <thead class="bg-[#e9f0ef]">
+          <tr>
+            <th class="py-3 px-4 rounded-l-lg">Nombre</th>
+            <th class="py-3 px-4">Descripción</th>
+            <th class="py-3 px-4 rounded-r-lg">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white">
+          <tr class="hover:bg-gray-50 border-b">
+            <td class="py-3 px-4">Bebidas</td>
+            <td class="py-3 px-4">Productos líquidos para consumo</td>
+            <td class="py-3 px-4 flex space-x-3">
+              <a href="crear_formulario.html" title="Editar" class="text-blue-500 hover:text-blue-700">✏️</a>
+              <button title="Eliminar" class="text-red-500 hover:text-red-700">🗑️</button>
+            </td>
+          </tr>
+          <tr class="hover:bg-gray-50 border-b">
+            <td class="py-3 px-4">Snacks</td>
+            <td class="py-3 px-4">Aperitivos y golosinas</td>
+            <td class="py-3 px-4 flex space-x-3">
+              <a href="crear_formulario.html" title="Editar" class="text-blue-500 hover:text-blue-700">✏️</a>
+              <button title="Eliminar" class="text-red-500 hover:text-red-700">🗑️</button>
+            </td>
+          </tr>
+          <tr class="hover:bg-gray-50">
+            <td class="py-3 px-4">Aseo</td>
+            <td class="py-3 px-4">Productos de limpieza e higiene</td>
+            <td class="py-3 px-4 flex space-x-3">
+              <a href="crear_formulario.html" title="Editar" class="text-blue-500 hover:text-blue-700">✏️</a>
+              <button title="Eliminar" class="text-red-500 hover:text-red-700">🗑️</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+</body>
+</html>
