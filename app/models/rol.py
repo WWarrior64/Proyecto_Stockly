@@ -3,6 +3,7 @@ from app.extensions import db
 
 class Rol(db.Model):
     __tablename__ = 'Rol'
+    __table_args__ = {'extend_existing': True}
 
     rol_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     nombre = db.Column(db.String(100), nullable=False, unique=True)

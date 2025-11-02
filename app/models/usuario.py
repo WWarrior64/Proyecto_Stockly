@@ -3,6 +3,7 @@ from flask_login import UserMixin
 
 class Usuario(db.Model, UserMixin):
     __tablename__ = 'Usuario'  # Debe coincidir exactamente con el nombre de la tabla en MySQL
+    __table_args__ = {'extend_existing': True}
 
     usuario_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     nombre = db.Column(db.String(150), nullable=False)
