@@ -58,7 +58,7 @@
                     @change="fetchLotes(producto_id)"
                     class="w-full border rounded-md px-3 py-2" required>
               <option value="" disabled selected>Seleccione producto</option>
-              <!-- <option v-for="p in productos" :value="p.id">{{ p.nombre }}</option> -->
+              
             </select>
           </div>
 
@@ -67,7 +67,7 @@
             <label class="block text-sm font-medium text-gray-700 mb-1">Lote (opcional)</label>
             <select v-model="lote_id" class="w-full border rounded-md px-3 py-2">
               <option value="">No asignar lote</option>
-              <!-- <option v-for="l in lotes" :value="l.id">{{ l.codigo }} — {{ l.cantidad }}</option> -->
+
             </select>
           </div>
 
@@ -104,7 +104,7 @@
             <select v-model="pedido_id" @change="onChangePedido"
                     class="w-full border rounded-md px-3 py-2" required>
               <option value="" disabled selected>Seleccione pedido</option>
-              <!-- <option v-for="p in pedidosPendientes" :value="p.id">#{{ p.codigo }} — {{ p.proveedor_nombre }}</option> -->
+
             </select>
           </div>
 
@@ -114,12 +114,7 @@
             <select v-model="detalle_pedido_id" @change="onChangeDetallePedido"
                     class="w-full border rounded-md px-3 py-2" required>
               <option value="" disabled selected>Seleccione ítem del pedido</option>
-              <!--
-                <option v-for="d in detallesPendientes" :value="d.id"
-                        :data-producto-id="d.producto_id">
-                  {{ d.nombre }} — Solicitado: {{ d.cantidad_solicitada }}
-                </option>
-              -->
+
             </select>
           </div>
         </div>
