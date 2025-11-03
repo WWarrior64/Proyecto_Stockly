@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Stockly - Registrar Movimiento</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body class="min-h-screen bg-brandTeal text-gray-900 antialiased flex items-start justify-center p-6">
+
+  <!-- CONTENEDOR (puede usarse como página o modal) -->
+  <div class="w-full max-w-4xl bg-white rounded-xl shadow-lg overflow-hidden">
+
+    <!-- Cabecera modal/página -->
+    <header class="px-6 py-4 border-b flex items-center justify-between">
+      <h2 class="text-xl font-semibold text-brandOrange">Registrar Movimiento de Inventario</h2>
+      <button class="text-sm text-gray-600 hover:text-brandOrange" aria-label="Cerrar">
+        ×
+      </button>
+    </header>
+
+    <!-- CUERPO: formulario adaptable (marcado con directivas Vue) -->
+    <!-- Asume que el componente Vue dispone de: tipo_movimiento, pedido_id, detalle_pedido_id, producto_id, lotes, cantidad, nota, fecha_fabricacion, fecha_vencimiento, usuario -->
+    <form class="p-6 space-y-6" @submit.prevent="guardarMovimiento">
+
+      <!-- Tipo movimiento -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de movimiento <span class="text-red-500">*</span></label>
+          <select v-model="tipo_movimiento"
+                  @change="onChangeTipoMovimiento"
+                  class="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brandOrange" required>
+            <option value="" disabled selected>Seleccione tipo</option>
+            <option value="recepcion_de_pedido">Recepción de pedido</option>
+            <option value="salida">Salida</option>
+            <option value="ajuste">Ajuste</option>
+            <option value="entrada">Entrada</option>
+            <option value="actualizacion_de_stock">Actualización de stock</option>
+            <!-- agregar otros tipos según necesites -->
+          </select>
+        </div>
+
+        <!-- Usuario (readonly) -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Usuario</label>
+          <input type="text" :value="usuario_nombre" readonly
+                 class="w-full border rounded-md px-3 py-2 bg-gray-100 text-gray-700">
+        </div>
+      </div>
+
+      <!-- SECCIÓN: Si tipo != 'recepcion_de_pedido' -->
+      <section v-if="tipo_movimiento !== 'recepcion_de_pedido'">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+
+          <!-- Producto -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Producto <span class="text-red-500">*</span></label>
+            <select v-model="producto_id"
+                    @change="fetchLotes(producto_id)"
+                    class="w-full border rounded-md px-3 py-2" required>
+              <option value="" disabled selected>Seleccione producto</option>
+              <!-- <option v-for="p in productos" :value="p.id">{{ p.nombre }}</option> -->
+            </select>
+          </div>
+
+          <!-- Lote (opcional, dependiente) -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Lote (opcional)</label>
+            <select v-model="lote_id" class="w-full border rounded-md px-3 py-2">
+              <option value="">No asignar lote</option>
+              <!-- <option v-for="l in lotes" :value="l.id">{{ l.codigo }} — {{ l.cantidad }}</option> -->
+            </select>
+          </div>
+
+          <!-- Cantidad -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Cantidad <span class="text-red-500">*</span></label>
+            <input v-model.number="cantidad" type="number" min="-999999" step="1" required
+                   class="w-full border rounded-md px-3 py-2 text-center" />
+            <p class="text-xs text-gray-500 mt-1">Usar valor negativo para salidas si aplica.</p>
+          </div>
+
+        </div>
+
+        <!-- Nota (requerida para 'ajuste') -->
+        <div v-if="tipo_movimiento === 'ajuste'" class="mt-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Nota (motivo del ajuste) <span class="text-red-500">*</span></label>
+          <textarea v-model="nota" rows="3" required
+                    class="w-full border rounded-md px-3 py-2"></textarea>
+        </div>
+
+        <div v-if="tipo_movimiento !== 'ajuste'" class="mt-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Nota (opcional)</label>
+          <textarea v-model="nota" rows="2" class="w-full border rounded-md px-3 py-2"></textarea>
+        </div>
+      </section>
+
+      <!-- SECCIÓN: Si tipo == 'recepcion_de_pedido' -->
+      <section v-if="tipo_movimiento === 'recepcion_de_pedido'" class="border-t pt-4">
+
+        <!-- Pedido (solo pendientes) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Pedido (pendientes) <span class="text-red-500">*</span></label>
+            <select v-model="pedido_id" @change="onChangePedido"
+                    class="w-full border rounded-md px-3 py-2" required>
+              <option value="" disabled selected>Seleccione pedido</option>
+              <!-- <option v-for="p in pedidosPendientes" :value="p.id">#{{ p.codigo }} — {{ p.proveedor_nombre }}</option> -->
+            </select>
+          </div>
+
+          <!-- Detalle de pedido: items pendientes -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Detalle de Pedido (ítem) <span class="text-red-500">*</span></label>
+            <select v-model="detalle_pedido_id" @change="onChangeDetallePedido"
+                    class="w-full border rounded-md px-3 py-2" required>
+              <option value="" disabled selected>Seleccione ítem del pedido</option>
+              <!--
+                <option v-for="d in detallesPendientes" :value="d.id"
+                        :data-producto-id="d.producto_id">
+                  {{ d.nombre }} — Solicitado: {{ d.cantidad_solicitada }}
+                </option>
+              -->
+            </select>
+          </div>
+        </div>
+
+        <!-- Campos del ítem (readonly/inputs) -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 items-end">
+
+          <!-- Producto (readonly, inferido del detalle) -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Producto</label>
+            <input type="text" :value="detalleSeleccionado ? detalleSeleccionado.nombre : ''" readonly
+                   class="w-full border rounded-md px-3 py-2 bg-gray-100">
+          </div>
+
+          <!-- Cantidad solicitada (info) -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Solicitado</label>
+            <input type="number" :value="detalleSeleccionado ? detalleSeleccionado.cantidad_solicitada : 0" readonly
+                   class="w-full border rounded-md px-3 py-2 bg-gray-100 text-center">
+          </div>
+
+          <!-- Cantidad recibida (manual) -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Cantidad recibida <span class="text-red-500">*</span></label>
+            <input v-model.number="cantidad_recibida" type="number"
+                   :min="0"
+                   :max="detalleSeleccionado ? detalleSeleccionado.cantidad_solicitada : null"
+                   required class="w-full border rounded-md px-3 py-2 text-center" />
+            <p class="text-xs text-gray-500 mt-1">Máx: cantidad solicitada.</p>
+          </div>
+        </div>
+
+        <!-- Lote código (opcional, autogenerar en backend si vacío) -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Código de lote (opcional)</label>
+            <input v-model="lote_codigo" type="text" placeholder="Dejar vacío para autogenerar"
+                   class="w-full border rounded-md px-3 py-2">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Fecha fabricación <span class="text-red-500">*</span></label>
+            <input v-model="fecha_fabricacion" type="date" required class="w-full border rounded-md px-3 py-2">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Fecha vencimiento <span class="text-red-500">*</span></label>
+            <input v-model="fecha_vencimiento" type="date" required class="w-full border rounded-md px-3 py-2">
+          </div>
+        </div>
+
+        <!-- Nota (opcional, para discrepancias) -->
+        <div class="mt-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Nota (discrepancias, observaciones)</label>
+          <textarea v-model="nota" rows="3" class="w-full border rounded-md px-3 py-2"></textarea>
+        </div>
+
+        <!-- Acciones específicas: Agregar otro ítem (post-guardado) -->
+        <div class="mt-3 text-sm text-gray-600">
+          <p>Soporta recepciones parciales. Después de guardar, puedes usar "Agregar otro ítem" para procesar más ítems del mismo pedido.</p>
+        </div>
+
+      </section>
+
+      <!-- BOTONES -->
+      <div class="flex justify-end gap-3 pt-2 border-t">
+        <button type="button" class="px-4 py-2 bg-gray-200 rounded-full hover:bg-gray-300" @click="cancelar">
+          Cancelar
+        </button>
+
+        <!-- Botón de "Agregar otro ítem" (se usa tras guardar una recepción parcial) -->
+        <button type="button" class="px-4 py-2 bg-white border rounded-full hover:bg-gray-50" @click="agregarOtroItem">
+          Agregar otro ítem
+        </button>
+
+        <button type="submit" class="px-5 py-2 bg-brandOrange text-white rounded-full shadow hover:brightness-95">
+          Guardar
+        </button>
+      </div>
+
+      <!-- Mensajes de validación / ayuda (colocar con v-if cuando integres) -->
+      <div class="mt-2 text-sm text-red-600" v-if="error">{{ error }}</div>
+      <div class="mt-2 text-sm text-green-600" v-if="success">{{ success }}</div>
+
+    </form>
+
+    <!-- NOTAS para la integración backend (comentadas en HTML para referencia) -->
+    <!--
+      Integración recomendada cuando se conecte con backend:
+
+      1) Al cambiar tipo_movimiento:
+         - Si != recepcion_de_pedido: cargar lista de /api/productos.
+         - Si == recepcion_de_pedido: cargar /api/pedidos?estado=pendiente.
+
+      2) Al seleccionar pedido (pedido_id):
+         GET /api/detalle-pedidos?pedido_id=:id&estado=pendiente  -> llenar detallesPendientes.
+
+      3) Al seleccionar detalle (detalle_pedido_id):
+         - detalleSeleccionado debe contener: id, producto_id, nombre, cantidad_solicitada, cantidad_recibida_actual (si trackeas).
+         - Mostrar producto readonly, cantidad solicitada y limitar cantidad_recibida <= cantidad_solicitada.
+
+      4) Al guardar (guardarMovimiento):
+         - Validar client-side:
+           * Campos requeridos
+           * Para recepcion_de_pedido: 0 < cantidad_recibida <= cantidad_solicitada
+         - Lógica backend (sugerida):
+           a) Si no existe lote y lote_codigo vacío -> POST /api/lotes (autogenerar código en backend)
+              payload: { producto_id, pedido_id?, codigo, fecha_fabricacion, fecha_vencimiento }
+           b) Insertar Stock (o actualizar): POST /api/stock o PUT aumentar cantidad con lote_id
+              payload: { lote_id, cantidad: cantidad_recibida }
+           c) Insertar MovimientoInventario: POST /api/movimientos
+              payload: { tipo: 'recepcion_de_pedido', usuario_id, pedido_id?, detalle_pedido_id?, producto_id, lote_id, cantidad, nota }
+           d) Actualizar DetallePedido: marcar cantidad recibida o restar pendientes; si todas las líneas recibidas -> PUT /api/pedidos/:id { estado: 'entregado' } o la lógica que uses.
+
+      5) Comportamiento "Agregar otro ítem":
+         - Después de un POST exitoso en recepción de pedido, limpiar únicamente los campos del ítem
+           (cantidad_recibida, lote_codigo, fechas, nota) y mantener pedido_id para procesar el siguiente detalle.
+    -->
+
+  </div>
+
+</body>
+</html>
