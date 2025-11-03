@@ -1,9 +1,13 @@
-from flask import Blueprint, render_template, jsonify, request, redirect, url_for
+import os
+import time
+from flask import Blueprint, current_app, render_template, jsonify, request, redirect, url_for
+from werkzeug.utils import secure_filename
 from flask_login import login_required, current_user
 from app.controllers.cuenta_controller import (
     get_user_json, get_users_json, get_user_by_id,
     create_user, update_user, delete_user,
-    get_roles_json, create_role, update_role, delete_role, is_admin
+    get_roles_json, create_role, update_role, delete_role, is_admin,
+    save_user_avatar, _avatar_url_for
 )
 
 cuenta_bp = Blueprint('cuenta', __name__, url_prefix='/cuenta')
@@ -19,10 +23,34 @@ def cuenta():
 @cuenta_bp.route('/editar', methods=['GET', 'POST'])
 @login_required
 def editar_cuenta():
+    """
+    GET: muestra la plantilla con el formulario.
+    POST: fallback desde el formulario HTML (cuando la API PUT no esté disponible o produzca 403).
+    El POST actualiza solo al usuario autenticado (current_user).
+    """
     if request.method == 'POST':
-        # Puedes procesar request.form aquí para actualizar current_user.
-        # Por simplicidad, redirigimos (el frontend hace fetch a /api/usuarios/<id>).
-        return redirect(url_for('cuenta.cuenta'))
+        # recogemos datos del form (fallback)
+        form = request.form or {}
+        data = {
+            "nombre": form.get('nombre'),
+            "apellido": form.get('apellido'),
+            "email": form.get('email'),
+            "numerotelefono": form.get('numerotelefono'),
+            "direccion": form.get('direccion')
+        }
+        # contraseña opcional
+        if form.get('contrasena'):
+            data['contrasena'] = form.get('contrasena')
+
+        try:
+            # actualizar solo al propio usuario
+            update_user(getattr(current_user, 'usuario_id'), data)
+            return redirect(url_for('cuenta.cuenta'))
+        except ValueError as e:
+            # mostrar error en la misma página
+            return render_template('user/cuenta_editar.html', error=str(e)), 400
+
+    # GET -> render template
     return render_template('user/cuenta_editar.html')
 
 
@@ -65,12 +93,18 @@ def api_usuario(id):
             return jsonify({"message": "Usuario no encontrado"}), 404
         return jsonify(get_user_json(user))
 
-    # PUT/DELETE -> solo admin
-    if not is_admin(current_user):
-        return jsonify({"message": "Acceso denegado"}), 403
-
+    # PUT/DELETE -> DELETE: solo admin
     if request.method == 'PUT':
+        # permitimos PUT si es admin o el propio usuario
+        if not (is_admin(current_user) or getattr(current_user, "usuario_id", None) == id):
+            return jsonify({"message": "Acceso denegado"}), 403
+
         data = request.get_json() or {}
+
+        # si no es admin, evitar que cambie rol_id (y cualquier otro campo sensible)
+        if not is_admin(current_user):
+            data.pop('rol_id', None)
+
         try:
             update_user(id, data)
             return jsonify({"message": "Usuario actualizado"})
@@ -78,6 +112,10 @@ def api_usuario(id):
             return jsonify({"message": str(e)}), 400
 
     if request.method == 'DELETE':
+        # solo admin puede eliminar usuarios
+        if not is_admin(current_user):
+            return jsonify({"message": "Acceso denegado"}), 403
+
         deleted = delete_user(id)
         if deleted:
             return jsonify({"message": "Usuario eliminado"})
@@ -120,3 +158,38 @@ def api_rol(id):
         if deleted:
             return jsonify({"message": "Rol eliminado"})
         return jsonify({"message": "Rol no encontrado"}), 404
+    
+@cuenta_bp.route('/api/usuarios/<int:id>/avatar', methods=['POST'])
+@login_required
+def api_upload_avatar(id):
+    # permitir si es admin o el propio usuario
+    if not (is_admin(current_user) or getattr(current_user, "usuario_id", None) == id):
+        return jsonify({"message": "Acceso denegado"}), 403
+
+    if 'avatar' not in request.files:
+        return jsonify({"message": "No se encontró el archivo 'avatar' en la petición."}), 400
+
+    file = request.files['avatar']
+    try:
+        filename = save_user_avatar(id, file)  # guarda y actualiza user.avatar (retorna filename)
+        # calcula mtime para cache-busting
+        upload_folder = current_app.config.get(
+            "AVATAR_UPLOAD_PATH",
+            os.path.join(current_app.root_path, "static", "uploads", "avatars")
+        )
+        file_path = os.path.join(upload_folder, secure_filename(filename))
+        try:
+            v = int(os.path.getmtime(file_path)) if os.path.exists(file_path) else int(time.time())
+        except Exception:
+            v = int(time.time())
+
+        avatar_url = url_for('static', filename=f'uploads/avatars/{filename}', _external=False) + f'?v={v}'
+        current_app.logger.info(f"Avatar uploaded: user={id} url={avatar_url}")
+        return jsonify({"message": "Avatar actualizado", "avatar": avatar_url})
+    except ValueError as e:
+        current_app.logger.warning(f"Avatar upload validation error: {e}")
+        return jsonify({"message": str(e)}), 400
+    except Exception:
+        current_app.logger.exception("Error al subir avatar")
+        return jsonify({"message": "Error interno al subir avatar"}), 500
+

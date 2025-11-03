@@ -16,6 +16,8 @@ from app.extensions import db, migrate, login_manager
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))   # carpeta donde está el archivo app.py
 STATIC_DIR = os.path.join(BASE_DIR, 'static')           # <proyecto>/static
 TEMPLATE_DIR = os.path.join(BASE_DIR, 'app', 'templates')  # <proyecto>/app/templates
+AVATAR_UPLOAD_PATH = os.path.join(BASE_DIR, 'static', 'uploads', 'avatars')
+MAX_CONTENT_LENGTH = 2 * 1024 * 1024  # 2MB
 
 app = Flask(
     __name__, 

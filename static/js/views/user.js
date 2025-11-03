@@ -9,6 +9,7 @@ const app = createApp({
     return {
       user: { fullName: '', role: '', email: '', address: '', phone: '', avatar: '', extraFields: [] },
       loading: true, error: null,
+      avatarPlaceholder: document.querySelector('meta[name="avatar-placeholder"]')?.content || '/static/images/avatar_placeholder.png',
 
       // admin data
       isAdmin: false,
@@ -28,6 +29,11 @@ const app = createApp({
       editingRole: null,
       roleForm: { nombre: '' }
     };
+  },
+  computed: {
+    currentAvatar() {
+      return (this.user && this.user.avatar) ? this.user.avatar : this.avatarPlaceholder;
+    }
   },
 
   async created() {

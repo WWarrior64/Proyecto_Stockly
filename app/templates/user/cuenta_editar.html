@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Editar Perfil - Stockly</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+
+  <!-- CSRF token (si usas Flask-WTF / middleware) -->
+  <meta name="csrf-token" content="{{ csrf_token() if csrf_token is defined else '' }}">
+
+  <meta name="login-url" content="{{ url_for('auth.login') }}">
+  <meta name="avatar-placeholder" content="{{ url_for('static', filename='images/avatar_placeholder.png') }}">
+
+  <!-- Vue -->
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+  <!-- Vista JS (module) -->
+  <script type="module" src="{{ url_for('static', filename='js/views/cuenta_editar.js') }}" defer></script>
+</head>
+<body class="bg-brandTeal min-h-screen flex justify-center p-4">
+  <div class="w-full max-w-4xl bg-brandTeal rounded-lg p-4">
+    <!-- Header (simplificado, reutiliza tu header si prefieres) -->
+    <header class="items-center mb-4">
+      <div class="flex items-center justify-between">
+        <a href="{{ url_for('main.home') }}" class="flex items-center gap-3" aria-label="Ir al inicio">
+          <img src="{{ url_for('static', filename='images/Logo_Stockly.png') }}" alt="Logo Stockly" class="w-14 h-14 object-contain">
+        </a>
+        <nav class="flex-1 flex justify-center" aria-label="Navegación principal">
+          <ul class="inline-flex bg-white/90 text-black rounded-full px-6 py-2 gap-6 items-center shadow">
+            <li><a href="{{ url_for('main.home') }}" class="text-black hover:text-brandOrange">Inicio</a></li>
+            <li><a href="{{ url_for('cuenta.cuenta') }}" class="font-semibold text-brandOrange">Cuenta</a></li>
+          </ul>
+        </nav>
+        <div class="w-12" aria-hidden="true"></div>
+      </div>
+    </header>
+
+    <main id="vm-edit" class="bg-white/95 rounded-2xl p-6 shadow-lg">
+      <h1 class="text-3xl font-extrabold text-brandOrange mb-4">Editar perfil</h1>
+
+      <div v-if="loading" class="py-8 text-center text-gray-500">Cargando...</div>
+
+      <form v-else @submit.prevent="submit" class="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+        <!-- Columna izquierda: avatar y nombre -->
+        <div class="w-40 h-40 rounded-full bg-gray-100 overflow-hidden shadow-md mb-4">
+        <img :src="currentAvatar" alt="Avatar" class="w-full h-full object-cover">
+        </div>
+
+        <!-- Botón estilizado para seleccionar archivo (input escondido) -->
+        <div class="flex flex-col items-center gap-2">
+        <input @change="onAvatarChange" ref="avatarInput" id="avatarFileInput" type="file" accept="image/*"
+                class="hidden" />
+        <label for="avatarFileInput"
+                class="cursor-pointer inline-flex items-center gap-2 px-3 py-2 rounded-md bg-white border text-sm shadow-sm hover:bg-gray-50">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7M8 7V4h8v3M8 14h.01M16 14h.01M12 11v6" /></svg>
+            Cambiar foto
+        </label>
+        <p class="text-xs text-gray-500">PNG, JPG — máximo 2MB</p>
+        </div>
+
+
+        <!-- Columna derecha: campos -->
+        <div class="md:col-span-2">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Nombre</label>
+              <input v-model="form.nombre" type="text" required class="mt-1 p-2 border rounded w-full" placeholder="Nombre" />
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Apellido</label>
+              <input v-model="form.apellido" type="text" class="mt-1 p-2 border rounded w-full" placeholder="Apellido" />
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Correo electrónico</label>
+              <input v-model="form.email" type="email" required class="mt-1 p-2 border rounded w-full" placeholder="correo@ejemplo.com" />
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Teléfono</label>
+              <input v-model="form.numerotelefono" type="tel" class="mt-1 p-2 border rounded w-full" placeholder="(+503) 1234 5678" />
+            </div>
+
+            <div class="md:col-span-2">
+              <label class="block text-sm font-medium text-gray-700">Dirección</label>
+              <textarea v-model="form.direccion" rows="2" class="mt-1 p-2 border rounded w-full" placeholder="Dirección"></textarea>
+            </div>
+
+            <div class="md:col-span-2">
+              <label class="block text-sm font-medium text-gray-700">Contraseña (dejar en blanco para no cambiar)</label>
+              <input v-model="form.contrasena" type="password" class="mt-1 p-2 border rounded w-full" placeholder="Nueva contraseña (opcional)" />
+            </div>
+          </div>
+
+          <!-- Acciones -->
+          <div class="mt-6 flex items-center justify-end gap-3">
+            <a href="{{ url_for('cuenta.cuenta') }}" class="px-4 py-2 rounded border border-gray-300 text-gray-800 hover:bg-gray-50">Cancelar</a>
+            <button type="submit" :disabled="saving" class="px-4 py-2 rounded bg-brandTeal text-white hover:opacity-95">
+              <span v-if="!saving">Guardar cambios</span>
+              <span v-else>Guardando...</span>
+            </button>
+          </div>
+
+          <div v-if="message" class="mt-4">
+            <p :class="{'text-green-600': messageType==='success', 'text-red-600': messageType==='error'}">[[ message ]]</p>
+          </div>
+        </div>
+      </form>
+
+      <!-- Hidden plain form fallback (POST) -->
+      <form id="fallback-post-form" action="{{ url_for('cuenta.editar_cuenta') }}" method="POST" class="hidden" enctype="multipart/form-data">
+        <input type="hidden" name="nombre" v-bind:value="form.nombre" />
+        <input type="hidden" name="apellido" v-bind:value="form.apellido" />
+        <input type="hidden" name="email" v-bind:value="form.email" />
+        <input type="hidden" name="numerotelefono" v-bind:value="form.numerotelefono" />
+        <input type="hidden" name="direccion" v-bind:value="form.direccion" />
+        <input type="hidden" name="contrasena" v-bind:value="form.contrasena" />
+        <!-- Si quieres enviar avatar via archivo necesitarás añadir input file aquí en el form -->
+      </form>
+    </main>
+  </div>
+</body>
+</html>

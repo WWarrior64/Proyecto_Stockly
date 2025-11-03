@@ -17,13 +17,13 @@ function _getCsrfHeader() {
 
 function _normalizeAvatar(avatar) {
   if (!avatar) return '/static/images/avatar_placeholder.png';
-  // Si es URL absoluta o ya comienza con /, devolver tal cual
   if (avatar.startsWith('http://') || avatar.startsWith('https://') || avatar.startsWith('/')) {
     return avatar;
   }
-  // Si guardas solo el filename (ej. 'usuario.png') asume carpeta static/images
-  return `/static/images/${avatar}`;
+  // si solo filename: asumimos uploads/avatars
+  return `/static/uploads/avatars/${avatar}`;
 }
+
 
 async function _handleJSONResponse(res) {
   const text = await res.text();
@@ -199,6 +199,29 @@ export const userService = {
     const parsed = await _handleJSONResponse(res);
     if (parsed.status === 401) { window.location.href = _getLoginUrlFallback(); }
     if (!parsed.ok) throw new Error(parsed.body?.message || 'Error actualizando rol');
+    return parsed.body || {};
+  },
+
+    // Subir avatar (FormData). Retorna parsed.body
+  async uploadAvatar(id, file) {
+    if (!file) throw new Error('No file provided');
+
+    const fd = new FormData();
+    fd.append('avatar', file);
+
+    // CSRF header (si existe)
+    const headers = _getCsrfHeader(); // NO incluir Content-Type; fetch lo gestiona para FormData
+
+    const res = await fetch(`/cuenta/api/usuarios/${id}/avatar`, {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers,
+      body: fd
+    });
+
+    const parsed = await _handleJSONResponse(res);
+    if (parsed.status === 401) { window.location.href = _getLoginUrlFallback(); }
+    if (!parsed.ok) throw new Error(parsed.body?.message || 'Error subiendo avatar');
     return parsed.body || {};
   },
 

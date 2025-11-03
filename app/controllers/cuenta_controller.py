@@ -1,23 +1,64 @@
+import time
 from flask import url_for, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.exc import IntegrityError
 
 from app.models import Usuario, Rol  # Asumiendo SQLAlchemy
 from app.extensions import db  # Importa db desde extensions.py
+import os
+from uuid import uuid4
+from werkzeug.utils import secure_filename
+from flask import current_app, url_for  # url_for ya importado en tu archivo
 
+ALLOWED_AVATAR_EXT = {"png", "jpg", "jpeg", "gif", "webp"}  # añadí webp opcionalmente
+
+def _allowed_avatar_filename(filename):
+    if not filename or '.' not in filename:
+        return False
+    ext = os.path.splitext(filename)[1].lower().lstrip(".")
+    return ext in ALLOWED_AVATAR_EXT
 
 def _avatar_url_for(user):
+    """
+    Devuelve la URL pública del avatar del user.
+    Si avatar es filename -> static/uploads/avatars/<filename>?v=<mtime>
+    Si avatar ya es URL absoluta o empieza por '/' -> se devuelve tal cual.
+    """
     avatar_field = getattr(user, "avatar", None)
-    if avatar_field:
-        if avatar_field.startswith("http://") or avatar_field.startswith("https://"):
-            return avatar_field
-        return url_for('static', filename=f'images/{avatar_field}')
-    return url_for('static', filename='images/avatar_placeholder.png')
+    if not avatar_field:
+        return url_for('static', filename='images/avatar_placeholder.png')
+
+    # Si ya es URL absoluta -> devolverla
+    if isinstance(avatar_field, str) and (avatar_field.startswith("http://") or avatar_field.startswith("https://")):
+        return avatar_field
+
+    # Si ya es un path absoluto (empieza con '/') -> devolverlo
+    if isinstance(avatar_field, str) and avatar_field.startswith('/'):
+        return avatar_field
+
+    # Si es solo un nombre de archivo -> construimos ruta uploads + ?v=mtime
+    filename = avatar_field
+    upload_folder = current_app.config.get(
+        "AVATAR_UPLOAD_PATH",
+        os.path.join(current_app.root_path, "static", "uploads", "avatars")
+    )
+    file_path = os.path.join(upload_folder, secure_filename(filename))
+
+    try:
+        v = int(os.path.getmtime(file_path)) if os.path.exists(file_path) else int(time.time())
+    except Exception:
+        v = int(time.time())
+
+    return url_for('static', filename=f'uploads/avatars/{filename}') + f'?v={v}'
 
 
+# --- JSON helpers ---
 def get_user_json(user):
     if not user or getattr(user, "usuario_id", None) is None:
         return {
+            "usuario_id": None,
+            "nombre": "",
+            "apellido": "",
             "fullName": "Invitado",
             "role": "Invitado",
             "email": "Ninguno",
@@ -34,17 +75,20 @@ def get_user_json(user):
         except Exception:
             rol_nombre = str(user.rol)
 
-    extra_fields = getattr(user, "extra_fields", []) or []
+    nombre = getattr(user, "nombre", "") or ""
+    apellido = getattr(user, "apellido", "") or ""
 
     return {
         "usuario_id": getattr(user, "usuario_id", None),
-        "fullName": f"{getattr(user, 'nombre', '')} {getattr(user, 'apellido', '')}".strip(),
+        "nombre": nombre,
+        "apellido": apellido,
+        "fullName": f"{nombre} {apellido}".strip() or getattr(user, "username", "") or "Usuario",
         "role": rol_nombre,
         "email": getattr(user, "email", ""),
         "address": getattr(user, "direccion", ""),
         "phone": getattr(user, "numerotelefono", ""),
         "avatar": _avatar_url_for(user),
-        "extraFields": extra_fields
+        "extraFields": getattr(user, "extra_fields", []) or []
     }
 
 
@@ -184,3 +228,76 @@ def is_admin(user):
     except Exception:
         pass
     return False
+
+def save_user_avatar(user_id, file_storage):
+    """
+    Guarda el avatar (FileStorage) para el usuario dado y actualiza user.avatar con el filename.
+    Retorna el filename guardado.
+    Lanza ValueError en caso de validación.
+    """
+    if not file_storage:
+        raise ValueError("No se proporcionó archivo.")
+
+    filename = getattr(file_storage, "filename", None)
+    if not filename:
+        raise ValueError("Nombre de archivo inválido.")
+
+    # Validar extension
+    if not _allowed_avatar_filename(filename):
+        raise ValueError("Tipo de archivo no permitido. Usa png/jpg/jpeg/gif (o webp).")
+
+    # Validar mimetype básica (opcional pero recomendado)
+    mimetype = getattr(file_storage, "mimetype", "") or ""
+    if not mimetype.startswith("image/"):
+        # algunos navegadores no siempre marcan el mimetype, así que no es 100% fiable
+        current_app.logger.warning(f"Upload avatar: mimetype sospechoso ({mimetype}) para archivo {filename}")
+
+    # generar nombre único
+    ext = os.path.splitext(filename)[1].lower()
+    new_name = f"{uuid4().hex}{ext}"
+
+    # Ruta de upload configurable
+    upload_folder = current_app.config.get(
+        "AVATAR_UPLOAD_PATH",
+        os.path.join(current_app.root_path, "static", "uploads", "avatars")
+    )
+    os.makedirs(upload_folder, exist_ok=True)
+
+    save_path = os.path.join(upload_folder, secure_filename(new_name))
+    try:
+        file_storage.save(save_path)
+        current_app.logger.info(f"Avatar guardado: user={user_id} path={save_path}")
+    except Exception as e:
+        current_app.logger.exception("Error guardando archivo de avatar.")
+        raise ValueError("No se pudo guardar el avatar.") from e
+
+    # Actualizar DB
+    user = Usuario.query.get(user_id)
+    if not user:
+        # eliminar archivo si user no existe
+        try:
+            os.remove(save_path)
+        except Exception:
+            pass
+        raise ValueError("Usuario no encontrado.")
+
+    # eliminar avatar anterior (opcional)
+    try:
+        prev = getattr(user, "avatar", None)
+        if prev:
+            prev_path = os.path.join(upload_folder, secure_filename(prev))
+            if os.path.exists(prev_path) and prev_path != save_path:
+                try:
+                    os.remove(prev_path)
+                    current_app.logger.info(f"Avatar previo eliminado: {prev_path}")
+                except Exception:
+                    current_app.logger.warning(f"No se pudo eliminar avatar previo: {prev_path}")
+    except Exception:
+        pass
+
+    # Guardamos sólo el nombre de archivo (no la ruta completa). get_user_json generará url con ?v
+    user.avatar = new_name
+    db.session.commit()
+    current_app.logger.info(f"Avatar asociado al usuario {user_id}: filename={new_name}")
+
+    return new_name
