@@ -5,6 +5,8 @@
   <title>Stockly - Pedidos</title>
   <!-- Tailwind compilado localmente -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script type="module" src="{{ url_for('static', filename='js/views/config.js') }}" defer></script>
 
 </head>
 <body class="min-h-screen bg-brandTeal text-gray-900 antialiased flex justify-center p-4">
@@ -31,7 +33,38 @@
         </ul>
       </nav>
 
-      <div class="w-12"></div>
+                        <!-- botón ajustes: pegado dentro del header principal, en la esquina derecha -->
+      <div id="settings-root" class="relative">
+        <button id="btn-settings"
+                @click="toggleSettings"
+                :aria-expanded="showSettings"
+                aria-controls="settings-menu"
+                class="flex items-center justify-center w-10 h-10 rounded-full bg-white/90 text-gray-800 shadow hover:scale-105 transition-transform duration-200"
+                title="Ajustes">
+          <!-- icono (engranaje) simplificado para mejor apariencia -->
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3" />
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+          </svg>
+        </button>
+
+        <!-- menu desplegable -->
+        <div v-cloak v-show="showSettings" id="settings-menu" role="menu" :aria-hidden="!showSettings"
+            class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg ring-1 ring-black/5 overflow-hidden z-50 text-gray-900">
+          <ul class="divide-y divide-gray-100">
+            <li>
+              <a href="{{ url_for('configuraciones.proveedores') }}" @click="showSettings = false" class="block w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors">
+                Gestionar proveedores
+              </a>
+            </li>
+            <li>
+              <a href="{{ url_for('configuraciones.categorias') }}" @click="showSettings = false" class="block w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors">
+                Gestionar categorías
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
     </div>
   </header>
 
