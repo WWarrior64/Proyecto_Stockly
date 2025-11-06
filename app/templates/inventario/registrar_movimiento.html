@@ -3,134 +3,215 @@
 <head>
   <meta charset="utf-8">
   <title>Stockly - Registrar Movimiento</title>
-  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+<body class="min-h-screen bg-brandTeal text-gray-900 antialiased flex items-start justify-center p-6">
 
-<div id="app" class="text-gray-900">
+  <!-- CONTENEDOR -->
+  <div class="w-full max-w-4xl bg-white rounded-xl shadow-lg overflow-hidden">
 
-  <!-- Selector de tipo de movimiento -->
-  <div class="bg-white p-6 rounded-xl shadow-lg w-96 text-center">
-    <h1 class="text-xl font-semibold text-brandOrange mb-4">Registrar Movimiento</h1>
-
-    <label class="block text-sm font-medium text-gray-700 mb-2">Seleccione tipo de movimiento</label>
-    <select v-model="tipo_movimiento"
-            @change="abrirModal"
-            class="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400">
-      <option value="">Seleccione...</option>
-      <option value="entrada">Entrada</option>
-      <option value="salida">Salida</option>
-      <option value="ajuste">Ajuste</option>
-      <option value="recepcion_de_pedido">Recepción de pedido</option>
-    </select>
-  </div>
-
-  <!-- MODAL flotante -->
-  <div v-if="mostrarModal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-    <div class="bg-white rounded-xl shadow-2xl w-full max-w-3xl p-6 relative animate-fadeIn">
-
-      <!-- Botón cerrar -->
-      <button @click="cerrarModal"
-              class="absolute top-3 right-3 text-gray-500 hover:text-red-600 text-2xl">&times;</button>
-
-      <!-- Contenido dinámico según tipo -->
-      <h2 class="text-xl font-semibold text-orange-500 mb-4 capitalize">
-        {{ tipo_movimiento.replace('_', ' ') }}
+    <!-- CABECERA -->
+    <header class="px-6 py-4 border-b flex items-center justify-between">
+      <h2 class="text-xl font-semibold text-brandOrange">
+        Registrar Movimiento de Inventario
       </h2>
+      <button class="text-sm text-gray-600 hover:text-brandOrange" aria-label="Cerrar">×</button>
+    </header>
 
-      <!-- Entrada -->
-      <div v-if="tipo_movimiento === 'entrada'">
-        <label class="block text-sm font-medium text-gray-700 mb-1">Producto</label>
-        <input type="text" v-model="formData.producto" class="w-full border rounded-md px-3 py-2 mb-3">
+    <!-- FORMULARIO -->
+    <form class="p-6 space-y-6" @submit.prevent="guardarMovimiento">
 
-        <label class="block text-sm font-medium text-gray-700 mb-1">Cantidad</label>
-        <input type="number" v-model="formData.cantidad" class="w-full border rounded-md px-3 py-2 mb-3">
+      <!-- Tipo movimiento + Usuario -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Tipo de movimiento <span class="text-red-500">*</span>
+          </label>
+          <select v-model="tipo_movimiento" @change="onChangeTipoMovimiento"
+                  class="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brandOrange"
+                  required>
+            <option value="" disabled selected>Seleccione tipo</option>
+            <option value="recepcion_de_pedido">Recepción de pedido</option>
+            <option value="salida">Salida</option>
+            <option value="ajuste">Ajuste</option>
+            <option value="entrada">Entrada</option>
+            <option value="actualizacion_de_stock">Actualización de stock</option>
+          </select>
+        </div>
 
-        <label class="block text-sm font-medium text-gray-700 mb-1">Nota</label>
-        <textarea v-model="formData.nota" class="w-full border rounded-md px-3 py-2 mb-4"></textarea>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Usuario</label>
+          <input type="text" :value="usuario_nombre" readonly
+                 class="w-full border rounded-md px-3 py-2 bg-gray-100 text-gray-700">
+        </div>
       </div>
 
-      <!-- Salida -->
-      <div v-if="tipo_movimiento === 'salida'">
-        <label class="block text-sm font-medium text-gray-700 mb-1">Producto</label>
-        <input type="text" v-model="formData.producto" class="w-full border rounded-md px-3 py-2 mb-3">
+      <!-- SECCIÓN: tipo != recepcion_de_pedido -->
+      <section v-if="tipo_movimiento !== 'recepcion_de_pedido'">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
 
-        <label class="block text-sm font-medium text-gray-700 mb-1">Cantidad (negativo si aplica)</label>
-        <input type="number" v-model="formData.cantidad" class="w-full border rounded-md px-3 py-2 mb-3">
+          <!-- Producto -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Producto <span class="text-red-500">*</span>
+            </label>
+            <select v-model="producto_id" @change="fetchLotes(producto_id)"
+                    class="w-full border rounded-md px-3 py-2" required>
+              <option value="" disabled selected>Seleccione producto</option>
+            </select>
+          </div>
+
+          <!-- Lote -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Lote (opcional)</label>
+            <select v-model="lote_id" class="w-full border rounded-md px-3 py-2">
+              <option value="">No asignar lote</option>
+            </select>
+          </div>
+
+          <!-- Cantidad -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Cantidad <span class="text-red-500">*</span>
+            </label>
+            <input v-model.number="cantidad" type="number" min="-999999" step="1" required
+                   class="w-full border rounded-md px-3 py-2 text-center" />
+            <p class="text-xs text-gray-500 mt-1">Usar valor negativo para salidas si aplica.</p>
+          </div>
+
+        </div>
+
+        <!-- Nota -->
+        <div v-if="tipo_movimiento === 'ajuste'" class="mt-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Nota (motivo del ajuste) <span class="text-red-500">*</span>
+          </label>
+          <textarea v-model="nota" rows="3" required class="w-full border rounded-md px-3 py-2"></textarea>
+        </div>
+
+        <div v-if="tipo_movimiento !== 'ajuste'" class="mt-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Nota (opcional)</label>
+          <textarea v-model="nota" rows="2" class="w-full border rounded-md px-3 py-2"></textarea>
+        </div>
+      </section>
+
+      <!-- SECCIÓN: tipo == recepcion_de_pedido -->
+      <section v-if="tipo_movimiento === 'recepcion_de_pedido'" class="border-t pt-4">
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Pedido -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Pedido (pendientes) <span class="text-red-500">*</span>
+            </label>
+            <select v-model="pedido_id" @change="onChangePedido"
+                    class="w-full border rounded-md px-3 py-2" required>
+              <option value="" disabled selected>Seleccione pedido</option>
+            </select>
+          </div>
+
+          <!-- Detalle pedido -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Detalle de Pedido (ítem) <span class="text-red-500">*</span>
+            </label>
+            <select v-model="detalle_pedido_id" @change="onChangeDetallePedido"
+                    class="w-full border rounded-md px-3 py-2" required>
+              <option value="" disabled selected>Seleccione ítem del pedido</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Detalles -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 items-end">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Producto</label>
+            <input type="text" :value="detalleSeleccionado ? detalleSeleccionado.nombre : ''" readonly
+                   class="w-full border rounded-md px-3 py-2 bg-gray-100">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Solicitado</label>
+            <input type="number" :value="detalleSeleccionado ? detalleSeleccionado.cantidad_solicitada : 0" readonly
+                   class="w-full border rounded-md px-3 py-2 bg-gray-100 text-center">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Cantidad recibida <span class="text-red-500">*</span>
+            </label>
+            <input v-model.number="cantidad_recibida" type="number" :min="0"
+                   :max="detalleSeleccionado ? detalleSeleccionado.cantidad_solicitada : null"
+                   required class="w-full border rounded-md px-3 py-2 text-center" />
+            <p class="text-xs text-gray-500 mt-1">Máx: cantidad solicitada.</p>
+          </div>
+        </div>
+
+        <!-- Lote -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Código de lote (opcional)
+            </label>
+            <input v-model="lote_codigo" type="text" placeholder="Dejar vacío para autogenerar"
+                   class="w-full border rounded-md px-3 py-2">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Fecha fabricación <span class="text-red-500">*</span>
+            </label>
+            <input v-model="fecha_fabricacion" type="date" required
+                   class="w-full border rounded-md px-3 py-2">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Fecha vencimiento <span class="text-red-500">*</span>
+            </label>
+            <input v-model="fecha_vencimiento" type="date" required
+                   class="w-full border rounded-md px-3 py-2">
+          </div>
+        </div>
+
+        <!-- Nota -->
+        <div class="mt-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Nota (discrepancias, observaciones)
+          </label>
+          <textarea v-model="nota" rows="3" class="w-full border rounded-md px-3 py-2"></textarea>
+        </div>
+
+        <!-- Ayuda -->
+        <div class="mt-3 text-sm text-gray-600">
+          <p>
+            Soporta recepciones parciales. Después de guardar, puedes usar "Agregar otro ítem"
+            para procesar más ítems del mismo pedido.
+          </p>
+        </div>
+
+      </section>
+
+      <!-- BOTONES -->
+      <div class="flex justify-end gap-3 pt-2 border-t">
+        <button type="button" class="px-4 py-2 bg-gray-200 rounded-full hover:bg-gray-300"
+                @click="cancelar">Cancelar</button>
+
+        <button type="button" class="px-4 py-2 bg-white border rounded-full hover:bg-gray-50"
+                @click="agregarOtroItem">Agregar otro ítem</button>
+
+        <button type="submit" class="px-5 py-2 bg-brandOrange text-white rounded-full shadow hover:brightness-95">
+          Guardar
+        </button>
       </div>
 
-      <!-- Ajuste -->
-      <div v-if="tipo_movimiento === 'ajuste'">
-        <label class="block text-sm font-medium text-gray-700 mb-1">Motivo del ajuste</label>
-        <textarea v-model="formData.nota" rows="3" class="w-full border rounded-md px-3 py-2 mb-4"></textarea>
+      <!-- Mensajes -->
+      <div class="mt-2 text-sm text-red-600" v-if="error">{{ error }}</div>
+      <div class="mt-2 text-sm text-green-600" v-if="success">{{ success }}</div>
+    </form>
 
-        <label class="block text-sm font-medium text-gray-700 mb-1">Cantidad ajustada</label>
-        <input type="number" v-model="formData.cantidad" class="w-full border rounded-md px-3 py-2">
-      </div>
-
-      <!-- Recepción de pedido -->
-      <div v-if="tipo_movimiento === 'recepcion_de_pedido'">
-        <label class="block text-sm font-medium text-gray-700 mb-1">Seleccionar Pedido</label>
-        <select v-model="formData.pedido" class="w-full border rounded-md px-3 py-2 mb-3">
-          <option value="">Seleccione...</option>
-          <option value="pedido_1">Pedido #1</option>
-          <option value="pedido_2">Pedido #2</option>
-        </select>
-
-        <label class="block text-sm font-medium text-gray-700 mb-1">Cantidad Recibida</label>
-        <input type="number" v-model="formData.cantidad" class="w-full border rounded-md px-3 py-2 mb-3">
-      </div>
-
-      <!-- Botones -->
-      <div class="flex justify-end mt-6 gap-3">
-        <button @click="cerrarModal" class="px-4 py-2 bg-gray-200 rounded-full hover:bg-gray-300">Cancelar</button>
-        <button @click="guardarMovimiento" class="px-5 py-2 bg-orange-500 text-white rounded-full hover:bg-orange-600">Guardar</button>
-      </div>
-
-    </div>
   </div>
-</div>
-
-<!-- Animación -->
-<style>
-@keyframes fadeIn { from {opacity:0; transform:scale(0.95);} to {opacity:1; transform:scale(1);} }
-.animate-fadeIn { animation: fadeIn 0.2s ease-in-out; }
-</style>
-
-<script>
-const { createApp } = Vue;
-
-createApp({
-  data() {
-    return {
-      tipo_movimiento: "",
-      mostrarModal: false,
-      formData: {
-        producto: "",
-        cantidad: "",
-        nota: "",
-        pedido: ""
-      }
-    }
-  },
-  methods: {
-    abrirModal() {
-      if (this.tipo_movimiento) this.mostrarModal = true;
-    },
-    cerrarModal() {
-      this.mostrarModal = false;
-      this.formData = { producto: "", cantidad: "", nota: "", pedido: "" };
-    },
-    guardarMovimiento() {
-      console.log("Guardando:", this.tipo_movimiento, this.formData);
-      alert(`Movimiento ${this.tipo_movimiento} registrado correctamente.`);
-      this.cerrarModal();
-    }
-  }
-}).mount("#app");
-</script>
 
 </body>
 </html>
