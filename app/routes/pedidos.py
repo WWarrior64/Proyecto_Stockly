@@ -1,14 +1,45 @@
 # app/routes/pedidos.py
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, flash, redirect, render_template, request, jsonify, url_for
+from flask_login import login_required
 
 pedidos_bp = Blueprint('pedidos', __name__, url_prefix='/pedidos')
 
 @pedidos_bp.route('/', methods=['GET'])
+@login_required
 def pedidos():
-    """Lista / vista principal de pedidos"""
-    # Aquí en el futuro pasaremos la lista real desde la base de datos:
-    # pedidos = Pedido.query.all()
+    # renderiza la vista principal (templates/pedidos/pedidos.html)
     return render_template('pedidos/pedidos.html')
+
+# Ruta que sirve el partial (fragmento) para crear/editar pedido
+@pedidos_bp.route('/crear_editar_pedido.html', methods=['GET'])
+@login_required
+def crear_editar_pedido_partial():
+    # Si llega ?id=... puedes pasarlo a la plantilla
+    pedido_id = request.args.get('id', '')
+    # render_template carga templates/pedidos/crear_editar_pedido.html
+    return render_template('pedidos/crear_editar_pedido.html', pedido_id=pedido_id)
+
+
+@pedidos_bp.route('/api/list')
+def api_list_pedidos():
+    # TODO: devolver lista real desde BD
+    return jsonify([ ... ])
+
+@pedidos_bp.route('/api/<int:pedido_id>')
+def api_get_pedido(pedido_id):
+    return jsonify({...})
+
+@pedidos_bp.route('/api', methods=['POST'])
+def api_create_pedido():
+    data = request.get_json()
+    # crear y devolver
+    return jsonify(data), 201
+
+@pedidos_bp.route('/api/<int:pedido_id>', methods=['PUT'])
+def api_update_pedido(pedido_id):
+    data = request.get_json()
+    # actualizar y devolver
+    return jsonify(data), 200
 
 
 @pedidos_bp.route('/crear', methods=['GET', 'POST'])
