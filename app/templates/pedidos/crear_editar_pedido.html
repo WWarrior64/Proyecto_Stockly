@@ -1,182 +1,174 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="utf-8">
-  <title>Stockly - Crear / Editar Pedido</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-</head>
+<!-- templates/pedidos/crear_editar_pedido.html (PARCIAL) -->
+<div id="pedidoPartial"
+     data-modal-type="crear_editar_pedido"
+     data-pedido-id="{{ pedido_id or request.args.get('id','') }}"
+     class="p-4 space-y-6">
 
-<body class="min-h-screen bg-brandTeal text-gray-900 antialiased flex items-start justify-center p-6">
+  <!-- ENCABEZADO -->
+  <header class="flex items-center justify-between mb-4">
+    <h2 class="text-xl font-semibold text-brandOrange">
+      {{ 'Editar Pedido' if pedido_id else 'Crear Pedido' }}
+    </h2>
+    <button type="button"
+            class="text-sm text-gray-600 hover:text-brandOrange close-modal-small"
+            aria-label="Cerrar">
+      ×
+    </button>
+  </header>
 
-  <!-- CONTENEDOR -->
-  <div class="w-full max-w-5xl bg-white rounded-xl shadow-lg overflow-hidden">
+  <!-- FORMULARIO -->
+  <form id="pedidoForm" class="space-y-6">
+    <!-- DATOS GENERALES -->
+    <section>
+      <h3 class="text-lg font-medium text-gray-800 mb-4">Datos del Pedido</h3>
 
-    <!-- CABECERA -->
-    <header class="px-6 py-4 border-b flex items-center justify-between">
-      <h2 class="text-xl font-semibold text-brandOrange">
-        {{ pedido_id ? 'Editar Pedido' : 'Crear Pedido' }}
-      </h2>
-      <button class="text-sm text-gray-600 hover:text-brandOrange" aria-label="Cerrar">×</button>
-    </header>
-
-    <!-- FORMULARIO -->
-    <form class="p-6 space-y-6" @submit.prevent="guardarPedido">
-
-      <!-- DATOS GENERALES -->
-      <section>
-        <h3 class="text-lg font-medium text-gray-800 mb-4">Datos del Pedido</h3>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <!-- Código -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Código <span class="text-red-500">*</span></label>
-            <input v-model="pedido.codigo" type="text" placeholder="Autogenerado o único"
-                   class="w-full border rounded-md px-3 py-2" required>
-          </div>
-
-          <!-- Fecha -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Fecha</label>
-            <input v-model="pedido.fecha" type="text" readonly
-                   class="w-full border rounded-md px-3 py-2 bg-gray-100 text-gray-700">
-          </div>
-
-          <!-- Estado -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
-            <select v-model="pedido.estado" class="w-full border rounded-md px-3 py-2">
-              <option value="pendiente">Pendiente</option>
-              <option value="entregado">Entregado</option>
-            </select>
-          </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Código -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Código <span class="text-red-500">*</span>
+          </label>
+          <input id="pedido_codigo"
+                 name="codigo"
+                 type="text"
+                 class="w-full border rounded-md px-3 py-2"
+                 placeholder="Autogenerado o único">
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-          <!-- Proveedor -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Proveedor <span class="text-red-500">*</span></label>
-            <select v-model="pedido.proveedor_id" class="w-full border rounded-md px-3 py-2" required>
-              <option value="" disabled selected>Seleccione proveedor</option>
-              <option v-for="prov in proveedores" :key="prov.id" :value="prov.id">{{ prov.nombre }}</option>
-            </select>
-          </div>
-
-          <!-- Tipo de pago -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de pago <span class="text-red-500">*</span></label>
-            <select v-model="pedido.tipo_pago_id" class="w-full border rounded-md px-3 py-2" required>
-              <option value="" disabled selected>Seleccione tipo</option>
-              <option v-for="tipo in tipoPagos" :key="tipo.id" :value="tipo.id">{{ tipo.nombre }}</option>
-            </select>
-          </div>
-
-          <!-- Botón Registrar Recepción -->
-          <div class="flex items-end justify-end">
-            <button v-if="pedido.estado === 'pendiente'"
-                    type="button"
-                    class="px-4 py-2 bg-brandOrange text-white rounded-full shadow hover:brightness-95"
-                    @click="registrarRecepcion">
-              Registrar Recepción
-            </button>
-          </div>
+        <!-- Fecha -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Fecha</label>
+          <input id="pedido_fecha"
+                 name="fecha"
+                 type="text"
+                 readonly
+                 value="{{ fecha_actual or '' }}"
+                 class="w-full border rounded-md px-3 py-2 bg-gray-100 text-gray-700">
         </div>
-      </section>
 
-      <!-- DETALLES DEL PEDIDO -->
-      <section class="border-t pt-4">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-lg font-medium text-gray-800">Detalles del Pedido</h3>
+        <!-- Estado -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+          <select id="pedido_estado"
+                  name="estado"
+                  class="w-full border rounded-md px-3 py-2">
+            <option value="pendiente">Pendiente</option>
+            <option value="entregado">Entregado</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+        <!-- Proveedor -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Proveedor <span class="text-red-500">*</span>
+          </label>
+          <select id="pedido_proveedor"
+                  name="proveedor_id"
+                  class="w-full border rounded-md px-3 py-2"
+                  required>
+            <option value="">Seleccione proveedor</option>
+          </select>
+        </div>
+
+        <!-- Tipo de pago -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Tipo de pago <span class="text-red-500">*</span>
+          </label>
+          <select id="pedido_tipo_pago"
+                  name="tipo_pago_id"
+                  class="w-full border rounded-md px-3 py-2"
+                  required>
+            <option value="">Seleccione tipo</option>
+          </select>
+        </div>
+
+        <!-- Botón Registrar Recepción -->
+        <div class="flex items-end justify-end">
           <button type="button"
-                  class="px-4 py-2 bg-brandOrange text-white rounded-full hover:brightness-95"
-                  @click="agregarDetalle">
-            + Agregar Producto
+                  id="pedido_registrar_recepcion"
+                  class="px-4 py-2 bg-brandOrange text-white rounded-full shadow hover:brightness-95"
+                  style="display:none;">
+            Registrar Recepción
           </button>
         </div>
+      </div>
+    </section>
 
-        <div class="overflow-auto border rounded-lg">
-          <table class="w-full table-auto text-sm">
-            <thead class="bg-gray-100 text-gray-700">
-              <tr>
-                <th class="px-3 py-2 text-left">Producto</th>
-                <th class="px-3 py-2 text-center">Cantidad</th>
-                <th class="px-3 py-2 text-center">Precio Unitario</th>
-                <th class="px-3 py-2 text-center">Subtotal</th>
-                <th class="px-3 py-2 text-center">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(detalle, index) in pedido.detalles" :key="index" class="border-t">
-                <!-- Producto -->
-                <td class="px-3 py-2">
-                  <select v-model="detalle.producto_id"
-                          @change="actualizarPrecio(detalle)"
-                          class="w-full border rounded-md px-2 py-1">
-                    <option value="" disabled selected>Seleccione producto</option>
-                    <option v-for="prod in productos" :key="prod.id" :value="prod.id">
-                      {{ prod.nombre }}
-                    </option>
-                  </select>
-                </td>
-
-                <!-- Cantidad -->
-                <td class="px-3 py-2 text-center">
-                  <input v-model.number="detalle.cantidad" type="number" min="1"
-                         class="w-20 border rounded-md px-2 py-1 text-center">
-                </td>
-
-                <!-- Precio Unitario -->
-                <td class="px-3 py-2 text-center">
-                  <input v-model.number="detalle.precio_unitario" type="number" min="0" step="0.01"
-                         class="w-24 border rounded-md px-2 py-1 text-center bg-gray-50"
-                         readonly>
-                </td>
-
-                <!-- Subtotal -->
-                <td class="px-3 py-2 text-center text-gray-800 font-medium">
-                  {{ (detalle.cantidad * detalle.precio_unitario).toFixed(2) }}
-                </td>
-
-                <!-- Eliminar -->
-                <td class="px-3 py-2 text-center">
-                  <button type="button"
-                          class="text-red-500 hover:text-red-700"
-                          @click="eliminarDetalle(index)">
-                    🗑
-                  </button>
-                </td>
-              </tr>
-
-              <tr v-if="pedido.detalles.length === 0">
-                <td colspan="5" class="text-center py-4 text-gray-500">Sin productos agregados.</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Total -->
-        <div class="flex justify-end mt-4">
-          <p class="text-lg font-semibold text-gray-800">
-            Total: ${{ totalPedido.toFixed(2) }}
-          </p>
-        </div>
-      </section>
-
-      <!-- BOTONES -->
-      <div class="flex justify-end gap-3 pt-2 border-t">
-        <button type="button" class="px-4 py-2 bg-gray-200 rounded-full hover:bg-gray-300"
-                @click="cancelar">Cancelar</button>
-
-        <button type="submit" class="px-5 py-2 bg-brandOrange text-white rounded-full shadow hover:brightness-95">
-          Guardar Pedido
+    <!-- DETALLES -->
+    <section class="border-t pt-4">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-medium text-gray-800">Detalles del Pedido</h3>
+        <button type="button"
+                id="pedido_agregar_detalle"
+                class="px-4 py-2 bg-brandOrange text-white rounded-full hover:brightness-95">
+          + Agregar Producto
         </button>
       </div>
 
-      <!-- MENSAJES -->
-      <div class="mt-2 text-sm text-red-600" v-if="error">{{ error }}</div>
-      <div class="mt-2 text-sm text-green-600" v-if="success">{{ success }}</div>
+      <div class="overflow-auto border rounded-lg">
+        <table class="w-full table-auto text-sm">
+          <thead class="bg-gray-100 text-gray-700">
+            <tr>
+              <th class="px-3 py-2 text-left">Producto</th>
+              <th class="px-3 py-2 text-center">Cantidad</th>
+              <th class="px-3 py-2 text-center">Precio Unitario</th>
+              <th class="px-3 py-2 text-center">Subtotal</th>
+              <th class="px-3 py-2 text-center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="pedido_detalles_tbody">
+            <tr class="no-items-row">
+              <td colspan="5" class="text-center py-4 text-gray-500">Sin productos agregados.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-    </form>
+      <!-- Fila plantilla (oculta) - clonar desde JS -->
+      <template id="pedido_detalle_template">
+        <tr class="detalle-row border-t">
+          <td class="px-3 py-2">
+            <select name="producto_id[]" class="w-full border rounded-md px-2 py-1 detalle-producto">
+              <option value="">Seleccione producto</option>
+            </select>
+          </td>
+          <td class="px-3 py-2 text-center">
+            <input name="cantidad[]" type="number" min="1" value="1" class="w-20 border rounded-md px-2 py-1 text-center detalle-cantidad">
+          </td>
+          <td class="px-3 py-2 text-center">
+            <input name="precio_unitario[]" type="number" min="0" step="0.01" value="0.00" readonly class="w-24 border rounded-md px-2 py-1 text-center bg-gray-50 detalle-precio">
+          </td>
+          <td class="px-3 py-2 text-center text-gray-800 font-medium detalle-subtotal">0.00</td>
+          <td class="px-3 py-2 text-center">
+            <button type="button" class="text-red-500 hover:text-red-700 detalle-eliminar">🗑</button>
+          </td>
+        </tr>
+      </template>
 
-  </div>
-</body>
-</html>
+      <!-- Total -->
+      <div class="flex justify-end mt-4">
+        <p id="pedido_total" class="text-lg font-semibold text-gray-800">Total: $0.00</p>
+      </div>
+    </section>
+
+    <!-- BOTONES -->
+    <div class="flex justify-end gap-3 pt-2 border-t">
+      <button type="button"
+              class="close-modal-small px-4 py-2 bg-gray-200 rounded-full hover:bg-gray-300">
+        Cancelar
+      </button>
+      <button id="pedido_save"
+              type="submit"
+              class="px-5 py-2 bg-brandOrange text-white rounded-full shadow hover:brightness-95">
+        Guardar Pedido
+      </button>
+    </div>
+
+    <!-- MENSAJES -->
+    <div id="pedido_error" class="mt-2 text-sm text-red-600 hidden"></div>
+    <div id="pedido_success" class="mt-2 text-sm text-green-600 hidden"></div>
+  </form>
+</div>
