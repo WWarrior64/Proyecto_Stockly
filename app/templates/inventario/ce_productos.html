@@ -1,0 +1,52 @@
+<!-- partial: ce_productos.html -->
+<div data-modal-type="ce_productos" data-product-id="{{ request.args.get('id','') }}">
+  <div class="p-4 max-w-2xl">
+
+    <form id="productForm" class="space-y-4">
+      <input type="hidden" id="prod_id" value="{{ request.args.get('id','') }}">
+
+      <div>
+        <label for="prod_sku" class="block text-sm font-medium text-gray-700">SKU <span class="text-red-600">*</span></label>
+        <input id="prod_sku" name="sku" required class="mt-1 block w-full border rounded p-2">
+      </div>
+
+      <div>
+        <label for="prod_nombre" class="block text-sm font-medium text-gray-700">Nombre <span class="text-red-600">*</span></label>
+        <input id="prod_nombre" name="nombre" required class="mt-1 block w-full border rounded p-2">
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label for="prod_precio" class="block text-sm font-medium text-gray-700">Precio unitario</label>
+          <input id="prod_precio" name="precio" type="number" step="0.01" min="0" class="mt-1 block w-full border rounded p-2">
+        </div>
+
+        <div>
+          <label for="prod_estado" class="block text-sm font-medium text-gray-700">Estado</label>
+          <select id="prod_estado" name="estado" class="mt-1 block w-full border rounded p-2 select-with-arrow">
+            <option value="">Seleccione</option>
+            <option value="activo">Activo</option>
+            <option value="inactivo">Inactivo</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label for="prod_categoria" class="block text-sm font-medium text-gray-700">Categoría</label>
+        <select id="prod_categoria" name="categoria" class="mt-1 block w-full border rounded p-2 select-with-arrow">
+          <option value="">Cargando categorías...</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="prod_descripcion" class="block text-sm font-medium text-gray-700">Descripción</label>
+        <textarea id="prod_descripcion" name="descripcion" rows="2" class="mt-1 block w-full border rounded p-2"></textarea>
+      </div>
+
+      <div class="flex justify-end gap-3 pt-2">
+        <button type="button" id="prod_cancel" class="px-4 py-2 bg-gray-200 rounded">Cancelar</button>
+        <button type="submit" id="prod_save" class="px-4 py-2 bg-brandOrange text-white rounded">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
