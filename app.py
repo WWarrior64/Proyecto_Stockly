@@ -6,6 +6,7 @@ from app.routes.inventario import inventario_bp
 from app.routes.cuenta import cuenta_bp
 from app.routes.pedidos import pedidos_bp
 from app.routes.reportes import reportes_bp
+from app.routes.configuraciones import config_bp
 from config import Config
 from app.models import Usuario, Rol, Producto # Importa otros modelos según sea necesario #Importa el modelo aquí para evitar ciclos al inicio del módulo
 from app.extensions import db, migrate, login_manager
@@ -49,6 +50,8 @@ app.register_blueprint(inventario_bp)
 app.register_blueprint(cuenta_bp)
 app.register_blueprint(pedidos_bp)
 app.register_blueprint(reportes_bp)
+app.register_blueprint(config_bp)
+
 
 @app.route("/")
 def root():
