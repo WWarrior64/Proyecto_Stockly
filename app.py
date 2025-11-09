@@ -54,7 +54,6 @@ app.register_blueprint(pedidos_bp)
 app.register_blueprint(reportes_bp)
 app.register_blueprint(config_bp)
 
-
 @app.route("/")
 def root():
     return redirect(url_for("auth.login"))
