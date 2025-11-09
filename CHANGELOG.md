@@ -20,6 +20,77 @@ Cada entrada contiene, de forma estructurada:
 
 ---
 
+## [0.5.0] - 09-11-2025
+- **Versión:** 0.5.0  
+- **Fecha:** 09-11-2025  
+- **Descripción:** Implementación de vistas de configuración para categorías y proveedores, modales de gestión de inventario, refactorización de la página de pedidos con integración de Vue.js y modales de creación/edición, soporte para avatares de usuario con carga y edición de perfil, y mejoras generales en la interfaz de usuario y pedidos (ajustes en pedidos, botón de configuración en vistas de usuario y edición de perfil, y limpieza de estilos CSS). Incluye servicios JavaScript de Vue.js, controladores y rutas API para CRUD de usuarios, roles y avatares.  
+- **Impacto:**
+  - **Nuevo:** Vistas de configuración, modales de inventario, refactorización de pedidos con modales, soporte para avatares y edición de perfil, paneles de administración para usuarios y roles.
+  - **Mejora:** Interfaz más dinámica con Vue.js en múltiples vistas, estilos CSS optimizados y unificados, y modularidad en servicios y controladores.
+  - **Operacional:** Requiere configuración de rutas de carga de archivos para avatares; mejoras en accesibilidad y responsividad en las vistas.
+
+### Detalle
+
+#### Added
+
+**Vistas de Configuración**
+- Carpetas y vistas para gestionar proveedores y categorías (configuraciones/proveedores.html, configuraciones/categorias.html).
+- Rutas y blueprints para configuraciones (config_bp en app.py y configuraciones.py).
+- Servicios y vistas JavaScript para CRUD dinámico de proveedores y categorías (proveedoresService.js, categoriasService.js, proveedores.js, categorias.js).
+
+**Gestión de Inventario**
+- Modales parciales para crear/editar productos (ce_productos.html), asignar proveedores (ap_productos.html) y registrar movimientos (registrar_movimiento.html).
+- Refactorización de inventario.html con Vue.js para lista de productos, búsqueda y gestión de modales.
+- Servicios JavaScript para inventario, movimientos, productos y proveedores (inventarioService.js, movimientoService.js, productoService.js, proveedorService.js).
+- Controladores Vue.js para inicialización de modales (inventarioView.js, modalControllers.js).
+
+**Refactorización de Pedidos**
+- Refactorización de pedidos.html con Vue.js para lista dinámica, búsqueda y modales.
+- Modal parcial para crear/editar pedidos (crear_editar_pedido.html) con formulario, tabla de detalles y cálculos.
+- Servicios y controladores JavaScript para pedidos (pedidosService.js, pedidosView.js, modalControllers_pedidos.js).
+- Endpoints API en pedidos.py para CRUD y datos auxiliares.
+
+**Soporte para Avatares y Edición de Perfil**
+- Campo avatar añadido al modelo Usuario y soporte para migraciones.
+- Ruta API para carga de avatares (/api/usuarios/<id>/avatar) con validación y almacenamiento en static/uploads/avatars.
+- Vista de edición de perfil (cuenta_editar.html) con Vue.js para formulario dinámico, previsualización y carga de avatar.
+- Mejoras en controladores (cuenta_controller.py) para manejo de avatares, JSON de usuarios/roles y CRUD.
+- Servicios JavaScript extendidos para avatares y admin (userService.js).
+
+**Mejoras en Interfaz de Usuario**
+- Botón de configuración añadido en vistas de usuario y edición de perfil para acceso rápido a proveedores y categorías.
+- Ajustes en el diseño de la página de pedidos para mejorar alineación y espaciado.
+- Limpieza y optimización de estilos CSS en styles.css para consistencia en modales, tablas y elementos UI.
+
+**Administración de Usuarios y Roles**
+- Paneles deslizantes en perfil de usuario para gestión de usuarios y roles (solo para admins).
+- Modales para crear/editar/eliminar usuarios y roles con integración Vue.js.
+- Endpoints API en cuenta.py para CRUD de usuarios y roles.
+
+**Assets y Configuración**
+- Archivo de primer avatar subido en static/uploads/avatars.
+- Configuración en app.py para ruta de carga de avatares y límite de tamaño de archivos (2MB).
+
+#### Changed
+- app.py: Añadida configuración para carga de archivos y longitud máxima de contenido.
+- Modelos (usuario.py, rol.py, producto.py): Ajustes menores en campos y relaciones.
+- Rutas (cuenta.py): Refactorizadas para API de usuarios, roles y avatares.
+- Vistas (usuario.html, cuenta_editar.html, pedidos.html): Integración de Vue.js, botones de configuración y mejoras en layout.
+- Servicios y vistas JS: Extensión para soporte de admin, avatares y modales en múltiples módulos.
+- Estilos CSS: Limpieza general, optimización de clases y correcciones en responsividad.
+
+#### Fixed
+- Errores en alineación y espaciado en vistas de pedidos y perfil.
+- Problemas de carga dinámica de modales y previsualización de avatares.
+- Validaciones en carga de avatares para evitar archivos inválidos o sobredimensionados.
+- Correcciones en accesibilidad de elementos interactivos (botones, modales).
+
+#### Removed
+- Código redundante en servicios y vistas JS tras refactorizaciones.
+- Estilos CSS obsoletos o duplicados.
+
+---
+
 ## [0.4.0] - 07-10-2025
 - **Versión:** 0.4.0  
 - **Fecha:** 07-10-2025  
