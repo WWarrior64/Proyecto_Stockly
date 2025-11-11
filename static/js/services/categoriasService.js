@@ -1,27 +1,48 @@
 // static/js/services/categoriasService.js
 export const categoriasService = {
   async list() {
-    // TODO: reemplaza con fetch('/api/categorias') real cuando esté listo
-    return [
-      { id: '1', nombre: 'Bebidas', descripcion: 'Productos líquidos' },
-      { id: '2', nombre: 'Snacks', descripcion: 'Aperitivos' }
-    ];
+    const resp = await fetch('/configuraciones/api/categorias');
+    if (!resp.ok) {
+      throw new Error(`Error HTTP: ${resp.status}`);
+    }
+    return await resp.json();
   },
   async getById(id) {
-    const list = await this.list();
-    return list.find(s => String(s.id) === String(id)) || null;
+    const resp = await fetch(`/configuraciones/api/categorias/${id}`);
+    if (!resp.ok) {
+      throw new Error(`Error HTTP: ${resp.status}`);
+    }
+    return await resp.json();
   },
   async create(payload) {
-    console.log('crear categoria', payload);
-    // Implementa un POST real aquí
-    return true;
+    const resp = await fetch('/configuraciones/api/categorias', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!resp.ok) {
+      throw new Error(`Error HTTP: ${resp.status}`);
+    }
+    return await resp.json();
   },
   async update(id, payload) {
-    console.log('update categoria', id, payload);
-    return true;
+    const resp = await fetch(`/configuraciones/api/categorias/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!resp.ok) {
+      throw new Error(`Error HTTP: ${resp.status}`);
+    }
+    return await resp.json();
   },
   async delete(id) {
-    console.log('delete categoria', id);
+    const resp = await fetch(`/configuraciones/api/categorias/${id}`, {
+      method: 'DELETE'
+    });
+    if (!resp.ok) {
+      throw new Error(`Error HTTP: ${resp.status}`);
+    }
     return true;
   }
 };
