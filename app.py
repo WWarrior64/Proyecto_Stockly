@@ -8,7 +8,7 @@ from app.routes.pedidos import pedidos_bp
 from app.routes.reportes import reportes_bp
 from app.routes.configuraciones import config_bp
 from config import Config
-from app.models import Usuario, Rol, Producto # Importa otros modelos según sea necesario #Importa el modelo aquí para evitar ciclos al inicio del módulo
+from app.models import Usuario, Rol, Producto, Categoria, DetallePedido, Pedido, ProductoProveedor, Proveedor, Stock, Lote, MovimientoInventario, TipoPago # Importa otros modelos según sea necesario #Importa el modelo aquí para evitar ciclos al inicio del módulo
 from app.extensions import db, migrate, login_manager
 
 # Configuración de rutas para archivos estáticos y plantillas

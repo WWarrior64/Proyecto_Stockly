@@ -774,10 +774,6 @@ video {
   margin-top: 1.5rem;
 }
 
-.mt-8 {
-  margin-top: 2rem;
-}
-
 .block {
   display: block;
 }
@@ -876,10 +872,6 @@ video {
 
 .max-h-80 {
   max-height: 20rem;
-}
-
-.max-h-\[60vh\] {
-  max-height: 60vh;
 }
 
 .max-h-\[80vh\] {
@@ -1136,6 +1128,10 @@ video {
 .divide-gray-200 > :not([hidden]) ~ :not([hidden]) {
   --tw-divide-opacity: 1;
   border-color: rgb(229 231 235 / var(--tw-divide-opacity, 1));
+}
+
+.self-center {
+  align-self: center;
 }
 
 .overflow-auto {

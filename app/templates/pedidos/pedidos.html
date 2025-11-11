@@ -14,6 +14,8 @@
    'crear_editar_pedido': url_for('pedidos.crear_editar_pedido_partial')
   } %}
 
+  <div id="settings-root" class="relative"></div>
+
   <div id="pedidosApp"
      class="w-full max-w-6xl bg-brandTeal rounded-lg p-4"
      data-modal-urls='{{ modal_urls | tojson }}'>
@@ -73,34 +75,89 @@
     </div>
   </header>
 
-    <!-- BARRA BÚSQUEDA + BOTONES -->
-    <div class="max-w-7xl mx-auto px-6 mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 bg-white rounded-t-lg items-center p-3">
-      <div class="md:col-span-2">
-        <div class="flex items-center border rounded-full px-3 py-1 bg-white">
-          <svg class="w-6 h-6 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"></path>
-          </svg>
-          <input id="search" type="text" placeholder="Buscar por producto, categoría o ID"
-                 class="w-full text-sm outline-none bg-transparent" v-model="query" />
+    <!-- BARRA BÚSQUEDA + BOTONES (actualizado con panel de filtros) -->
+<div class="max-w-7xl mx-auto px-6 mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 bg-white rounded-t-lg items-center p-3">
+  <div class="md:col-span-2">
+    <div class="flex items-center border rounded-full px-3 py-1 bg-white">
+      <svg class="w-6 h-6 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"></path>
+      </svg>
+      <input id="search" type="text" placeholder="Buscar por producto, categoría, código, proveedor, fecha o total"
+             class="w-full text-sm outline-none bg-transparent" v-model="query" />
+    </div>
+    <!-- panel de filtros (colapsable) -->
+    <div v-show="showFilters" class="mt-3 bg-gray-50 border rounded-lg p-4 space-y-3">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+        <!-- Estado -->
+        <div>
+          <label class="text-xs text-gray-600">Estado</label>
+          <select v-model="filters.estado" class="w-full border rounded px-2 py-1">
+            <option value="">Todos</option>
+            <option value="pendiente">Pendiente</option>
+            <option value="entregado">Entregado</option>
+          </select>
+        </div>
+
+        <!-- Proveedor (filtra por nombre devuelto en pedidos.proveedor_nombre) -->
+        <div>
+          <label class="text-xs text-gray-600">Proveedor</label>
+          <select v-model="filters.proveedor_nombre" class="w-full border rounded px-2 py-1">
+            <option value="">Todos</option>
+            <option v-for="prov in proveedores" :key="prov.id" :value="prov.nombre" v-text="prov.nombre"></option>
+          </select>
+        </div>
+
+        <!-- Fecha desde -->
+        <div>
+          <label class="text-xs text-gray-600">Fecha desde</label>
+          <input type="date" v-model="filters.fecha_from" class="w-full border rounded px-2 py-1" />
+        </div>
+
+        <!-- Fecha hasta -->
+        <div>
+          <label class="text-xs text-gray-600">Fecha hasta</label>
+          <input type="date" v-model="filters.fecha_to" class="w-full border rounded px-2 py-1" />
         </div>
       </div>
 
-      <div class="flex justify-end gap-3">
-        <button class="inline-flex items-center gap-2 px-6 py-0 rounded-full border border-gray-200 bg-gray-50 text-sm hover:bg-gray-100 transition">
-          <img src="{{ url_for('static', filename='images/filter.png') }}" alt="" class="w-9 h-9 object-contain" >
-          <span class="font-medium">Filtros</span>
-        </button>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+        <div>
+          <label class="text-xs text-gray-600">Total mínimo</label>
+          <input type="number" min="0" step="0.01" v-model.number="filters.min_total" class="w-full border rounded px-2 py-1" />
+        </div>
+        <div>
+          <label class="text-xs text-gray-600">Total máximo</label>
+          <input type="number" min="0" step="0.01" v-model.number="filters.max_total" class="w-full border rounded px-2 py-1" />
+        </div>
 
-        <!-- Abrir modal para crear (nota: usa openModal para cargar archivo remoto como modal) -->
-        <button @click="openModal('crear_editar_pedido')" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brandOrange text-white text-sm shadow hover:brightness-95 transition">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-          </svg>
-          Nuevo pedido
-        </button>
+        <div class="md:col-span-2 flex items-end gap-2">
+          <button @click="applyFilters" class="px-4 py-2 bg-brandOrange text-white rounded-full shadow hover:brightness-95">Aplicar</button>
+          <button @click="clearFilters" class="px-4 py-2 bg-gray-200 rounded-full hover:bg-gray-300">Limpiar</button>
+          <div class="text-sm text-gray-600 ml-auto self-center" v-if="filteredPedidos && filteredPedidos.length !== undefined">
+            <span v-text="filteredPedidos.length"></span> resultados
+          </div>
+
+        </div>
       </div>
     </div>
+  </div>
+
+  <div class="flex justify-end gap-3">
+    <button @click="toggleFilters" class="inline-flex items-center gap-2 px-6 py-0 rounded-full border border-gray-200 bg-gray-50 text-sm hover:bg-gray-100 transition">
+      <img src="{{ url_for('static', filename='images/filter.png') }}" alt="" class="w-9 h-9 object-contain" >
+      <span class="font-medium">Filtros</span>
+    </button>
+
+    <button @click="openModal('crear_editar_pedido')" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brandOrange text-white text-sm shadow hover:brightness-95 transition">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+      </svg>
+      Nuevo pedido
+    </button>
+  </div>
+</div>
+
 
     <!-- TABLA -->
     <div class="bg-white rounded-b-lg max-h-80 overflow-y-auto mt-0">
@@ -118,13 +175,12 @@
         </thead>
         <tbody>
           <tr v-for="pedido in filteredPedidos" :key="pedido.id" class="border-b hover:bg-gray-50">
-            <td class="p-3">[[ pedido.codigo ]]</td>
-            <td class="p-3">[[ pedido.proveedor_nombre || '—' ]]</td>
-            <td class="p-3">[[ pedido.fecha ]]</td>
-            <td class="p-3 text-center">[[ pedido.cantidad ]]</td>
-            <td class="p-3">$ [[ pedido.total.toFixed(2) ]]</td>
-            <td class="p-3">[[ pedido.estado ]]</td>
-
+            <td class="p-3"><span v-text="pedido.codigo || ''"></span></td>
+            <td class="p-3"><span v-text="pedido.proveedor_nombre || '—'"></span></td>
+            <td class="p-3"><span v-text="pedido.fecha || ''"></span></td>
+            <td class="p-3 text-center"><span v-text="pedido.cantidad ?? 0"></span></td>
+            <td class="p-3">$ <span v-text="formatCurrency(pedido.total)"></span></td>
+            <td class="p-3"><span v-text="pedido.estado || ''"></span></td>
             <td class="p-3 text-right">
               <div class="inline-flex gap-2">
                 <!-- Editar abre modal con id -->
@@ -141,7 +197,7 @@
           </tr>
         </tbody>
       </table>
-    </main>
+    </div>
 
     <!-- MODAL FLOTANTE (inyecta el HTML remoto) -->
     <transition name="fade">
@@ -151,7 +207,7 @@
         <div class="relative z-10 w-full max-w-4xl mx-4">
           <div class="bg-white rounded-lg shadow-xl overflow-auto max-h-[85vh] p-4">
             <div class="flex justify-between items-center mb-4">
-              <h3 class="text-lg font-semibold">[[ modalTitle ]]</h3>
+              <h3 class="text-lg font-semibold"><span v-text="modalTitle"></span></h3>
               <button @click="closeModal" class="px-3 py-1 rounded hover:bg-gray-100">Cerrar</button>
             </div>
 
@@ -165,7 +221,6 @@
   </div>
 
   <!-- SCRIPTS -->
-  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
   <script src="{{ url_for('static', filename='js/services/pedidosService.js') }}"></script>
   <script src="{{ url_for('static', filename='js/views/pedidosView.js') }}"></script>
   <script src="{{ url_for('static', filename='js/views/modalControllers_pedidos.js') }}"></script>
