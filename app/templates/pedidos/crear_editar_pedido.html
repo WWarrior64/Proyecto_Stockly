@@ -2,71 +2,60 @@
 <div id="pedidoPartial"
      data-modal-type="crear_editar_pedido"
      data-pedido-id="{{ pedido_id or request.args.get('id','') }}"
-     class="p-4 space-y-6">
-
-  <!-- ENCABEZADO -->
-  <header class="flex items-center justify-between mb-4">
-    <h2 class="text-xl font-semibold text-brandOrange">
-      {{ 'Editar Pedido' if pedido_id else 'Crear Pedido' }}
-    </h2>
-    <button type="button"
-            class="text-sm text-gray-600 hover:text-brandOrange close-modal-small"
-            aria-label="Cerrar">
-      ×
-    </button>
-  </header>
+     class="p-6 space-y-6">
 
   <!-- FORMULARIO -->
   <form id="pedidoForm" class="space-y-6">
     <!-- DATOS GENERALES -->
-    <section>
-      <h3 class="text-lg font-medium text-gray-800 mb-4">Datos del Pedido</h3>
+    <section class="bg-gray-50 rounded-lg p-5 border border-gray-200">
+      <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wide mb-4">Información del Pedido</h3>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <!-- Código -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
+          <label class="block text-sm font-semibold text-gray-800 mb-2">
             Código <span class="text-red-500">*</span>
           </label>
           <input id="pedido_codigo"
                  name="codigo"
                  type="text"
-                 class="w-full border rounded-md px-3 py-2"
-                 placeholder="Autogenerado o único">
+                 required
+                 class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-brandOrange focus:border-transparent transition-all"
+                 placeholder="Ej: PED-001">
         </div>
 
         <!-- Fecha -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Fecha</label>
+          <label class="block text-sm font-semibold text-gray-800 mb-2">Fecha</label>
           <input id="pedido_fecha"
                  name="fecha"
                  type="text"
                  readonly
                  value="{{ fecha_actual or '' }}"
-                 class="w-full border rounded-md px-3 py-2 bg-gray-100 text-gray-700">
+                 class="w-full border border-gray-300 rounded-lg px-4 py-2.5 bg-gray-100 text-gray-600 cursor-not-allowed">
         </div>
 
         <!-- Estado -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+          <label class="block text-sm font-semibold text-gray-800 mb-2">Estado</label>
           <select id="pedido_estado"
                   name="estado"
-                  class="w-full border rounded-md px-3 py-2">
+                  class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-brandOrange focus:border-transparent transition-all appearance-none bg-white">
             <option value="pendiente">Pendiente</option>
             <option value="entregado">Entregado</option>
           </select>
         </div>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
         <!-- Proveedor -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
+          <label class="block text-sm font-semibold text-gray-800 mb-2">
             Proveedor <span class="text-red-500">*</span>
           </label>
           <select id="pedido_proveedor"
                   name="proveedor_id"
-                  class="w-full border rounded-md px-3 py-2"
+                  class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-brandOrange focus:border-transparent transition-all appearance-none bg-white"
                   required>
             <option value="">Seleccione proveedor</option>
           </select>
@@ -74,101 +63,127 @@
 
         <!-- Tipo de pago -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
+          <label class="block text-sm font-semibold text-gray-800 mb-2">
             Tipo de pago <span class="text-red-500">*</span>
           </label>
           <select id="pedido_tipo_pago"
                   name="tipo_pago_id"
-                  class="w-full border rounded-md px-3 py-2"
+                  class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-brandOrange focus:border-transparent transition-all appearance-none bg-white"
                   required>
             <option value="">Seleccione tipo</option>
           </select>
         </div>
+      </div>
 
-        <!-- Botón Registrar Recepción -->
-        <div class="flex items-end justify-end">
-          <button type="button"
-                  id="pedido_registrar_recepcion"
-                  class="px-4 py-2 bg-brandOrange text-white rounded-full shadow hover:brightness-95"
-                  style="display:none;">
-            Registrar Recepción
-          </button>
-        </div>
+      <!-- Botón Registrar Recepción -->
+      <div class="mt-4 flex justify-end">
+        <button type="button"
+                id="pedido_registrar_recepcion"
+                class="inline-flex items-center gap-2 px-5 py-2.5 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors shadow-md"
+                style="display:none;">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Registrar Recepción
+        </button>
       </div>
     </section>
 
     <!-- DETALLES -->
-    <section class="border-t pt-4">
+    <section>
       <div class="flex items-center justify-between mb-4">
-        <h3 class="text-lg font-medium text-gray-800">Detalles del Pedido</h3>
+        <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wide">Productos del Pedido</h3>
         <button type="button"
                 id="pedido_agregar_detalle"
-                class="px-4 py-2 bg-brandOrange text-white rounded-full hover:brightness-95">
-          + Agregar Producto
+                class="inline-flex items-center gap-2 px-5 py-2.5 bg-brandOrange text-white rounded-lg font-medium hover:bg-orange-600 transition-colors shadow-md">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          Agregar Producto
         </button>
       </div>
 
-      <div class="overflow-auto border rounded-lg">
-        <table class="w-full table-auto text-sm">
-          <thead class="bg-gray-100 text-gray-700">
-            <tr>
-              <th class="px-3 py-2 text-left">Producto</th>
-              <th class="px-3 py-2 text-center">Cantidad</th>
-              <th class="px-3 py-2 text-center">Precio Unitario</th>
-              <th class="px-3 py-2 text-center">Subtotal</th>
-              <th class="px-3 py-2 text-center">Acciones</th>
+      <div class="overflow-auto border border-gray-200 rounded-lg">
+        <table class="w-full text-sm">
+          <thead class="bg-gradient-to-r from-gray-50 to-gray-100 sticky top-0">
+            <tr class="border-b border-gray-200">
+              <th class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Producto</th>
+              <th class="px-4 py-3 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">Cantidad</th>
+              <th class="px-4 py-3 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">Precio Unitario</th>
+              <th class="px-4 py-3 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">Subtotal</th>
+              <th class="px-4 py-3 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">Acciones</th>
             </tr>
           </thead>
-          <tbody id="pedido_detalles_tbody">
+          <tbody id="pedido_detalles_tbody" class="bg-white divide-y divide-gray-100">
             <tr class="no-items-row">
-              <td colspan="5" class="text-center py-4 text-gray-500">Sin productos agregados.</td>
+              <td colspan="5" class="px-4 py-8 text-center">
+                <svg class="w-12 h-12 mx-auto text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                </svg>
+                <p class="text-gray-500 font-medium">No hay productos agregados</p>
+              </td>
             </tr>
           </tbody>
         </table>
       </div>
 
-      <!-- Fila plantilla (oculta) - clonar desde JS -->
+      <!-- Fila plantilla (oculta) -->
       <template id="pedido_detalle_template">
-        <tr class="detalle-row border-t">
-          <td class="px-3 py-2">
-            <select name="producto_id[]" class="w-full border rounded-md px-2 py-1 detalle-producto">
+        <tr class="detalle-row hover:bg-gray-50 transition-colors">
+          <td class="px-4 py-3">
+            <select name="producto_id[]" class="w-full border border-gray-300 rounded-lg px-3 py-2 detalle-producto focus:outline-none focus:ring-2 focus:ring-brandOrange appearance-none bg-white">
               <option value="">Seleccione producto</option>
             </select>
           </td>
-          <td class="px-3 py-2 text-center">
-            <input name="cantidad[]" type="number" min="1" value="1" class="w-20 border rounded-md px-2 py-1 text-center detalle-cantidad">
+          <td class="px-4 py-3">
+            <input name="cantidad[]" type="number" min="1" value="1" class="w-24 border border-gray-300 rounded-lg px-3 py-2 text-center detalle-cantidad focus:outline-none focus:ring-2 focus:ring-brandOrange">
           </td>
-          <td class="px-3 py-2 text-center">
-            <input name="precio_unitario[]" type="number" min="0" step="0.01" value="0.00" readonly class="w-24 border rounded-md px-2 py-1 text-center bg-gray-50 detalle-precio">
+          <td class="px-4 py-3">
+            <div class="relative">
+              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+              <input name="precio_unitario[]" type="number" min="0" step="0.01" value="0.00" readonly class="w-32 border border-gray-300 rounded-lg pl-8 pr-3 py-2 text-center bg-gray-100 detalle-precio">
+            </div>
           </td>
-          <td class="px-3 py-2 text-center text-gray-800 font-medium detalle-subtotal">0.00</td>
-          <td class="px-3 py-2 text-center">
-            <button type="button" class="text-red-500 hover:text-red-700 detalle-eliminar">🗑</button>
+          <td class="px-4 py-3 text-center">
+            <span class="font-semibold text-gray-900 detalle-subtotal">$0.00</span>
+          </td>
+          <td class="px-4 py-3 text-center">
+            <button type="button" class="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-red-50 text-gray-600 hover:text-red-600 transition-all detalle-eliminar mx-auto" title="Eliminar">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6" stroke-linecap="round" stroke-linejoin="round"></polyline>
+                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke-linecap="round" stroke-linejoin="round"></path>
+                <path d="M10 11v6" stroke-linecap="round" stroke-linejoin="round"></path>
+                <path d="M14 11v6" stroke-linecap="round" stroke-linejoin="round"></path>
+              </svg>
+            </button>
           </td>
         </tr>
       </template>
 
       <!-- Total -->
-      <div class="flex justify-end mt-4">
-        <p id="pedido_total" class="text-lg font-semibold text-gray-800">Total: $0.00</p>
+      <div class="bg-gradient-to-r from-brandTeal/5 to-brandOrange/5 rounded-lg p-4 mt-4 border border-brandTeal/20">
+        <div class="flex justify-between items-center">
+          <span class="text-sm font-semibold text-gray-700 uppercase">Total del Pedido</span>
+          <p id="pedido_total" class="text-2xl font-bold text-gray-900">$0.00</p>
+        </div>
       </div>
     </section>
 
     <!-- BOTONES -->
-    <div class="flex justify-end gap-3 pt-2 border-t">
+    <div class="flex justify-end gap-3 pt-4 border-t border-gray-200">
       <button type="button"
-              class="close-modal-small px-4 py-2 bg-gray-200 rounded-full hover:bg-gray-300">
+              class="close-modal-small px-6 py-2.5 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors">
         Cancelar
       </button>
       <button id="pedido_save"
               type="submit"
-              class="px-5 py-2 bg-brandOrange text-white rounded-full shadow hover:brightness-95">
+              class="px-6 py-2.5 bg-brandOrange text-white rounded-lg font-medium hover:bg-orange-600 transition-colors shadow-md hover:shadow-lg">
         Guardar Pedido
       </button>
     </div>
 
     <!-- MENSAJES -->
-    <div id="pedido_error" class="mt-2 text-sm text-red-600 hidden"></div>
-    <div id="pedido_success" class="mt-2 text-sm text-green-600 hidden"></div>
+    <div id="pedido_error" class="hidden mt-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm"></div>
+    <div id="pedido_success" class="hidden mt-4 p-4 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm"></div>
   </form>
 </div>

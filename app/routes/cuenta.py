@@ -193,3 +193,13 @@ def api_upload_avatar(id):
         current_app.logger.exception("Error al subir avatar")
         return jsonify({"message": "Error interno al subir avatar"}), 500
 
+@cuenta_bp.route('/api/user', methods=['GET'])
+def api_user():
+    if current_user.is_authenticated:
+        return jsonify({
+            'nombre': current_user.nombre,
+            'apellido': current_user.apellido or '',
+            'email': current_user.email or ''
+        })
+    else:
+        return jsonify({'nombre': 'Usuario Anónimo'}), 401
