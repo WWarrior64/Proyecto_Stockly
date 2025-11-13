@@ -224,8 +224,8 @@ const app = createApp({
           color: [249, 115, 22],
         },
         {
-          label: "Edad Promedio Lotes",
-          value: `${ind.avg_age || 0} años`,
+          label: "Antigüedad Promedio Pedidos",
+          value: `${ind.avg_age || "Sin datos"}`,
           color: [139, 92, 246],
         },
       ];
@@ -294,8 +294,8 @@ const app = createApp({
       if (this.donutChart && this.donutChart.canvas) {
         const imgData = this.chartToDataURL(this.donutChart);
         if (imgData) {
-          const imgWidth = contentWidth * 0.6;
-          const imgHeight = imgWidth * 0.6;
+          const imgWidth = contentWidth * 0.8;
+          const imgHeight = imgWidth * 0.7;
 
           if (y + imgHeight > pageHeight - margin) {
             doc.addPage();
@@ -359,7 +359,7 @@ const app = createApp({
       if (this.barChart && this.barChart.canvas) {
         const imgData = this.chartToDataURL(this.barChart);
         if (imgData) {
-          const imgWidth = contentWidth * 0.7;
+          const imgWidth = contentWidth * 0.85;
           const imgHeight = imgWidth * 0.5;
 
           if (y + imgHeight > pageHeight - margin) {
@@ -367,7 +367,14 @@ const app = createApp({
             y = margin;
           }
 
-          doc.addImage(imgData, "PNG", margin, y, imgWidth, imgHeight);
+          doc.addImage(
+            imgData,
+            "PNG",
+            margin + (contentWidth - imgWidth) / 2,
+            y,
+            imgWidth,
+            imgHeight
+          );
           y += imgHeight + 12;
         }
       }
@@ -418,7 +425,7 @@ const app = createApp({
       if (this.lineChart && this.lineChart.canvas) {
         const imgData = this.chartToDataURL(this.lineChart);
         if (imgData) {
-          const imgWidth = contentWidth;
+          const imgWidth = contentWidth * 0.95;
           const imgHeight = imgWidth * 0.4;
 
           if (y + imgHeight > pageHeight - margin) {
@@ -426,7 +433,14 @@ const app = createApp({
             y = margin;
           }
 
-          doc.addImage(imgData, "PNG", margin, y, imgWidth, imgHeight);
+          doc.addImage(
+            imgData,
+            "PNG",
+            margin + (contentWidth - imgWidth) / 2,
+            y,
+            imgWidth,
+            imgHeight
+          );
         }
       }
 
@@ -457,10 +471,15 @@ const app = createApp({
       const w = srcCanvas.width;
       const h = srcCanvas.height;
 
+      // Crear canvas con mayor resolución para mejor calidad en PDF
+      const scaleFactor = 2;
       const tmp = document.createElement("canvas");
-      tmp.width = w;
-      tmp.height = h;
+      tmp.width = w * scaleFactor;
+      tmp.height = h * scaleFactor;
       const ctx = tmp.getContext("2d");
+
+      // Escalar el contexto para mantener la calidad
+      ctx.scale(scaleFactor, scaleFactor);
 
       ctx.fillStyle = "#ffffff";
       ctx.fillRect(0, 0, w, h);

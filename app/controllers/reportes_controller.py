@@ -32,15 +32,30 @@ def get_indicators():
                              .scalar() or 0
     total_value = round(float(total_value), 2)  # Cambié a 2 decimales para valores monetarios; ajusta si necesitas 3
 
-    # Average lot age in years
+    # Average order age in days (based on Pedido.pedido_fecha, not lot manufacturing date)
     current_date = func.curdate()
-    avg_age_days = db.session.query(func.avg(func.datediff(current_date, Lote.fecha_fabricacion))).filter(Lote.fecha_fabricacion.isnot(None)).scalar() or 0
+    avg_age_days = db.session.query(func.avg(func.datediff(current_date, Pedido.pedido_fecha))).filter(Pedido.pedido_fecha.isnot(None)).scalar() or 0
+    avg_age_days = float(avg_age_days) if avg_age_days else 0
+    
+    # Display as days if less than 30, otherwise as months, otherwise as years
+    if avg_age_days < 30:
+        avg_age_display = f"{round(avg_age_days)}"
+        age_unit = "días"
+    elif avg_age_days < 365:
+        avg_age_display = f"{round(avg_age_days / 30)}"
+        age_unit = "meses"
+    else:
+        avg_age_display = f"{round(avg_age_days / 365)}"
+        age_unit = "años"
+    
+    # Return both for flexibility
     avg_age_years = round(avg_age_days / 365)
+    avg_age = f"{avg_age_display} {age_unit}" if avg_age_display != "0" else "Sin datos"
 
     return {
         'availability': availability,
         'total_value': total_value,
-        'avg_age': avg_age_years
+        'avg_age': avg_age
     }
 
 def get_category_distribution():
