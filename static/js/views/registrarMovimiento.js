@@ -6,6 +6,7 @@ import {
   createMovimiento,
   fetchRecepcionesPedido,
   fetchCurrentUser,
+  fetchProductStock,
 } from "/static/js/services/movimientoService.js";
 
 let currentUser = null;
@@ -78,6 +79,34 @@ export async function initMovimientoModal(id) {
             .join("");
       } catch (error) {
         console.error("Error al cargar lotes:", error);
+      }
+    }
+    // Limpiar mensaje de error cuando se cambia el producto
+    document.getElementById("mov_msg_error").classList.add("hidden");
+  });
+
+  // Validar cantidad en tiempo real para salidas
+  const inputCantidad = document.getElementById("mov_cantidad");
+  inputCantidad.addEventListener("change", async (e) => {
+    const tipo = selectTipo.value;
+    const productoId = selectProducto.value;
+    const cantidad = parseFloat(e.target.value);
+
+    if (tipo === "salida" && productoId && cantidad) {
+      try {
+        const product = await fetchProductStock(productoId);
+        const stockActual = product.stock || 0;
+        const cantidadSalida = Math.abs(cantidad);
+
+        if (cantidadSalida > stockActual) {
+          showError(
+            `No hay suficiente stock. Stock disponible: ${stockActual}, Cantidad a retirar: ${cantidadSalida}`
+          );
+        } else {
+          document.getElementById("mov_msg_error").classList.add("hidden");
+        }
+      } catch (error) {
+        console.error("Error al verificar stock:", error);
       }
     }
   });
@@ -207,6 +236,28 @@ export async function initMovimientoModal(id) {
       if (!cantidad || cantidad === 0) {
         showError("La cantidad debe ser diferente de 0");
         return false;
+      }
+
+      // Validar si es salida y la cantidad es mayor que el stock disponible
+      if (tipo === "salida") {
+        try {
+          const product = await fetchProductStock(productoId);
+          const stockActual = product.stock || 0;
+
+          // Si es salida, la cantidad será negativa, así que tomamos el valor absoluto
+          const cantidadSalida = Math.abs(cantidad);
+
+          if (cantidadSalida > stockActual) {
+            showError(
+              `No hay suficiente stock. Stock disponible: ${stockActual}, Cantidad a retirar: ${cantidadSalida}`
+            );
+            return false;
+          }
+        } catch (error) {
+          console.error("Error al verificar stock:", error);
+          showError("Error al verificar el stock disponible");
+          return false;
+        }
       }
 
       data = {

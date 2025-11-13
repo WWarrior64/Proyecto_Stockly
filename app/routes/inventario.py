@@ -3,6 +3,7 @@
 from flask import Blueprint, render_template, jsonify, request, abort
 from flask_login import current_user, login_required
 
+from app.extensions import db
 from app.decorators import api_login_required
 from app.controllers.inventario_controller import (
     get_asignacion, list_products, get_product, create_product, update_product, delete_product,
@@ -43,7 +44,14 @@ def api_list_products():
 
 @inventario_bp.route('/api/productos/<int:id>', methods=['GET'])
 def api_get_product(id):
+    from sqlalchemy import func
+    from app.models import Stock, Lote
+    
     product = get_product(id)
+    
+    # Calcular stock total sumando todos los lotes del producto
+    total_stock = db.session.query(func.sum(Stock.cantidad)).join(Lote).filter(Lote.producto_id == id).scalar() or 0
+    
     return jsonify({
         'id': product.producto_id,
         'sku': product.sku,
@@ -51,7 +59,8 @@ def api_get_product(id):
         'precio': float(product.preciounitario) if product.preciounitario else None,
         'estado': product.estado,
         'categoria_id': product.categoria_id,
-        'descripcion': product.descripcion or ''
+        'descripcion': product.descripcion or '',
+        'stock': float(total_stock)
     })
 
 @inventario_bp.route('/api/productos', methods=['POST'])

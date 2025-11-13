@@ -70,3 +70,12 @@ export async function fetchCurrentUser() {
   }
   return await response.json();
 }
+
+export async function fetchProductStock(productId) {
+  const response = await fetch(`/inventario/api/productos/${productId}`);
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.description || `HTTP ${response.status}`);
+  }
+  return await response.json();
+}
