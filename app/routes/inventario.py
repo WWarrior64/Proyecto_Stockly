@@ -8,7 +8,7 @@ from app.controllers.inventario_controller import (
     get_asignacion, list_products, get_product, create_product, update_product, delete_product,
     list_asignaciones, create_asignacion, update_asignacion, delete_asignacion,
     list_pedidos_pendientes, list_detalles_pedido, list_lotes, create_movimiento,
-    list_recepciones_pedido
+    list_recepciones_pedido, check_and_create_auto_orders
 )
 from app.controllers.categoria_controller import list_categorias  # Import for categories
 from app.controllers.proveedor_controller import list_proveedores  # Import for providers
@@ -33,7 +33,11 @@ def registrar_movimiento():
 
 # API for products
 @inventario_bp.route('/api/productos', methods=['GET'])
+@api_login_required
 def api_list_products():
+    # Verificar y crear pedidos automáticos para productos con stock bajo
+    check_and_create_auto_orders()
+    
     products = list_products()
     return jsonify(products)
 

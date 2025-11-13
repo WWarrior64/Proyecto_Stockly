@@ -3,7 +3,7 @@
 from flask import abort
 from flask_login import current_user
 from sqlalchemy import func
-from datetime import date
+from datetime import date, datetime, timedelta
 from decimal import Decimal
 import random
 import string
@@ -19,6 +19,13 @@ def generate_lote_codigo():
     while True:
         code = 'LOT-' + ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
         if not Lote.query.filter_by(lote_codigo=code).first():
+            return code
+
+def generate_pedido_codigo():
+    """Genera un código de pedido único, e.g., PED-XXXXXX"""
+    while True:
+        code = 'PED-' + ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+        if not Pedido.query.filter_by(pedido_codigo=code).first():
             return code
 
 def list_products():
@@ -373,3 +380,77 @@ def create_movimiento(data):
         if hasattr(e, 'code'):
             raise
         abort(500, description=f"Error al crear movimiento: {str(e)}")
+
+def check_and_create_auto_orders():
+    """Verifica productos con stock <= 10 y crea pedidos automáticos si no existen"""
+    try:
+        # Obtener todos los productos
+        productos = Producto.query.all()
+        
+        for producto in productos:
+            # Calcular stock total del producto sumando todos sus lotes
+            total_stock = db.session.query(func.sum(Stock.cantidad)).join(Lote).filter(
+                Lote.producto_id == producto.producto_id
+            ).scalar() or 0
+            
+            # Si el stock es <= 10, crear un pedido automático
+            if total_stock <= 10:
+                # Verificar si ya existe un pedido pendiente para este producto
+                pedido_existente = db.session.query(Pedido).join(DetallePedido).filter(
+                    DetallePedido.producto_id == producto.producto_id,
+                    Pedido.estado == 'pendiente'
+                ).first()
+                
+                # Si no existe pedido pendiente, crear uno
+                if not pedido_existente:
+                    # Obtener el proveedor preferido
+                    proveedor_asign = ProductoProveedor.query.filter_by(
+                        producto_id=producto.producto_id,
+                        preferido=True
+                    ).first()
+                    
+                    # Si no hay proveedor preferido, usar el primero disponible
+                    if not proveedor_asign:
+                        proveedor_asign = ProductoProveedor.query.filter_by(
+                            producto_id=producto.producto_id
+                        ).first()
+                    
+                    # Si hay al menos un proveedor asignado, crear el pedido
+                    if proveedor_asign:
+                        # Calcular cantidad a ordenar: pedido mínimo del proveedor
+                        cantidad_orden = proveedor_asign.pedido_minimo or 1
+                        
+                        # Calcular fecha de entrega estimada
+                        plazo_dias = proveedor_asign.plazo_entrega_dias or 0
+                        fecha_entrega = date.today() + timedelta(days=plazo_dias)
+                        
+                        # Crear nuevo pedido
+                        nuevo_pedido = Pedido(
+                            pedido_codigo=generate_pedido_codigo(),
+                            pedido_fecha=datetime.now(),
+                            fecha_entrega=fecha_entrega,
+                            tipo_pedido='compra',
+                            proveedor_id=proveedor_asign.proveedor_id,
+                            tipo_pago_id=None,  # Sin tipo de pago especificado
+                            estado='pendiente'
+                        )
+                        db.session.add(nuevo_pedido)
+                        db.session.flush()  # Para obtener el pedido_id
+                        
+                        # Crear detalle del pedido
+                        detalle = DetallePedido(
+                            pedido_id=nuevo_pedido.pedido_id,
+                            producto_id=producto.producto_id,
+                            cantidad_solicitada=Decimal(str(cantidad_orden)),
+                            precio_unitario=proveedor_asign.precio_compra
+                        )
+                        db.session.add(detalle)
+                        db.session.commit()
+        
+        return True
+    except Exception as e:
+        db.session.rollback()
+        import traceback
+        traceback.print_exc()
+        print(f"Error al crear pedidos automáticos: {str(e)}")
+        return False
