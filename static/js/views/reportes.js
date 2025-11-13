@@ -1,23 +1,23 @@
-// static/js/views/reportes.js
-import { reportesService } from '/static/js/services/reportesService.js';
+import { reportesService } from "/static/js/services/reportesService.js";
 
 const { createApp } = Vue;
 
 const app = createApp({
-  delimiters: ['[[', ']]'],  // Avoid Jinja conflict
+  delimiters: ["[[", "]]"],
   data() {
     return {
       stats: null,
       loading: true,
-      error: null
+      error: null,
+      showSettings: false,
     };
   },
   async created() {
     try {
       this.stats = await reportesService.getStats();
     } catch (e) {
-      console.error('Error cargando stats', e);
-      this.error = e.message || 'Error cargando datos';
+      console.error("Error cargando stats", e);
+      this.error = e.message || "Error cargando datos";
     } finally {
       this.loading = false;
       this.$nextTick(() => {
@@ -26,352 +26,454 @@ const app = createApp({
     }
   },
   methods: {
+    toggleSettings() {
+      this.showSettings = !this.showSettings;
+    },
     initCharts() {
       if (!this.stats) return;
 
-      // Colores fijos para donut
-      const colors = ['#3B82F6', '#F59E0B', '#10B981', '#EF4444', '#9CA3AF', '#6366F1', '#EC4899'];
+      const colors = {
+        primary: [
+          "#14b8a6",
+          "#f97316",
+          "#3b82f6",
+          "#ef4444",
+          "#8b5cf6",
+          "#10b981",
+          "#f59e0b",
+        ],
+        teal: "#14b8a6",
+        orange: "#f97316",
+        blue: "#3b82f6",
+      };
 
-      // Donut Chart
-      this.donutChart = new Chart(document.getElementById('donutChart'), {
-        type: 'doughnut',
-        data: {
-          labels: this.stats.donut.labels,
-          datasets: [{
-            data: this.stats.donut.data,
-            backgroundColor: colors.slice(0, this.stats.donut.labels.length)
-          }]
-        },
-        options: {
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              position: 'right'
-            }
-          }
-        }
-      });
+      const donutCtx = document.getElementById("donutChart");
+      if (donutCtx) {
+        this.donutChart = new Chart(donutCtx, {
+          type: "doughnut",
+          data: {
+            labels: this.stats.donut.labels,
+            datasets: [
+              {
+                data: this.stats.donut.data,
+                backgroundColor: colors.primary,
+                borderWidth: 2,
+                borderColor: "#fff",
+              },
+            ],
+          },
+          options: {
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: "right",
+                labels: {
+                  padding: 15,
+                  font: { size: 12 },
+                },
+              },
+            },
+          },
+        });
+      }
 
-      // Bar Chart
-      this.barChart = new Chart(document.getElementById('barChart'), {
-        type: 'bar',
-        data: {
-          labels: this.stats.bar.labels,
-          datasets: this.stats.bar.datasets.map((ds, idx) => ({
-            label: ds.label,
-            data: ds.data,
-            backgroundColor: colors[idx]
-          }))
-        },
-        options: {
-          maintainAspectRatio: false,
-          scales: {
-            y: { beginAtZero: true }
-          }
-        }
-      });
+      const barCtx = document.getElementById("barChart");
+      if (barCtx) {
+        this.barChart = new Chart(barCtx, {
+          type: "bar",
+          data: {
+            labels: this.stats.bar.labels,
+            datasets: this.stats.bar.datasets.map((ds, idx) => ({
+              label: ds.label,
+              data: ds.data,
+              backgroundColor: idx === 0 ? colors.teal : colors.orange,
+              borderRadius: 4,
+            })),
+          },
+          options: {
+            maintainAspectRatio: false,
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: { precision: 0 },
+              },
+            },
+            plugins: {
+              legend: {
+                labels: { font: { size: 12 } },
+              },
+            },
+          },
+        });
+      }
 
-      // Line Chart
-      this.lineChart = new Chart(document.getElementById('lineChart'), {
-        type: 'line',
-        data: {
-          labels: this.stats.line.labels,
-          datasets: this.stats.line.datasets.map((ds, idx) => ({
-            label: ds.label,
-            data: ds.data,
-            borderColor: colors[idx],
-            fill: false
-          }))
-        },
-        options: {
-          maintainAspectRatio: false,
-          scales: {
-            y: { beginAtZero: true }
-          }
-        }
-      });
+      const lineCtx = document.getElementById("lineChart");
+      if (lineCtx) {
+        this.lineChart = new Chart(lineCtx, {
+          type: "line",
+          data: {
+            labels: this.stats.line.labels,
+            datasets: this.stats.line.datasets.map((ds, idx) => ({
+              label: ds.label,
+              data: ds.data,
+              borderColor: idx === 0 ? colors.teal : colors.orange,
+              backgroundColor:
+                idx === 0 ? colors.teal + "20" : colors.orange + "20",
+              borderWidth: 3,
+              fill: true,
+              tension: 0.4,
+            })),
+          },
+          options: {
+            maintainAspectRatio: false,
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: { precision: 0 },
+              },
+            },
+            plugins: {
+              legend: {
+                labels: { font: { size: 12 } },
+              },
+            },
+          },
+        });
+      }
     },
-    // Reemplaza el método downloadReport en tu reportes.js por esto:
-// usa el namespace UMD de jsPDF
 
-async downloadReport() {
-  console.log('[reportes] start downloadReport (jsPDF path)');
+    async downloadReport() {
+      console.log("Iniciando generación de PDF");
 
-  if (!this.stats) {
-    alert('No hay datos para generar el informe.');
-    return;
-  }
+      if (!this.stats) {
+        alert("No hay datos para generar el informe.");
+        return;
+      }
 
-  // asegurar que Chart instances existan
-  if (!this.donutChart || !this.barChart || !this.lineChart) {
-    console.warn('[reportes] charts no están listos. Intentando iniciar/esperar un poco...');
-    await new Promise(r => setTimeout(r, 300));
-  }
+      const { jsPDF } = window.jspdf || {};
+      if (!jsPDF) {
+        alert(
+          "jsPDF no está disponible. Verifica que la librería esté cargada."
+        );
+        return;
+      }
 
-  // obtener imágenes desde charts
-  let donutImg, barImg, lineImg;
-  try {
-    donutImg = chartToDataURLWithWhiteBg(this.donutChart, 'image/jpeg', 1.0);
-    barImg   = chartToDataURLWithWhiteBg(this.barChart,   'image/jpeg', 1.0);
-    lineImg  = chartToDataURLWithWhiteBg(this.lineChart,  'image/jpeg', 1.0);
-  } catch (e) {
-    console.warn('[reportes] error creando imagenes con fondo blanco', e);
-    // fallback simples usando toBase64Image si existe
-    try { donutImg = this.donutChart && this.donutChart.toBase64Image && this.donutChart.toBase64Image(); } catch(_) {}
-    try { barImg   = this.barChart   && this.barChart.toBase64Image   && this.barChart.toBase64Image(); } catch(_) {}
-    try { lineImg  = this.lineChart  && this.lineChart.toBase64Image  && this.lineChart.toBase64Image(); } catch(_) {}
-  }
+      await new Promise((r) => setTimeout(r, 100));
 
+      const doc = new jsPDF({
+        unit: "mm",
+        format: "a4",
+        orientation: "portrait",
+      });
 
-  // Chequeo básico de disponibilidad de jsPDF
-  const { jsPDF } = window.jspdf || (window.jspdf = window.jspdf || {});
-  if (!jsPDF && !window.jsPDF) {
-    console.warn('[reportes] jsPDF no disponible en window.jspdf. Intentando fallback a html2pdf...');
-    // fallback a html2pdf (si está)
-    if (window.html2pdf) {
-      console.log('[reportes] usando fallback html2pdf');
-      return await this._downloadWithHtml2pdfFallback();
-    } else {
-      alert('No se encontró jsPDF ni html2pdf. Agrega las librerías en el HTML.');
-      return;
-    }
-  }
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const margin = 15;
+      const contentWidth = pageWidth - margin * 2;
+      let y = margin;
 
-  // crear doc
-  const doc = new (window.jspdf && window.jspdf.jsPDF ? window.jspdf.jsPDF : window.jsPDF)({
-    unit: 'pt',
-    format: 'a4',
-    orientation: 'portrait'
-  });
+      doc.setFontSize(24);
+      doc.setTextColor(20, 184, 166);
+      doc.setFont(undefined, "bold");
+      doc.text("Stockly", margin, y);
 
-  const pageWidth = doc.internal.pageSize.getWidth();
-  const margin = 40;
-  let cursorY = 40;
+      y += 10;
+      doc.setFontSize(18);
+      doc.setTextColor(40, 40, 40);
+      doc.text("Reporte de Estadísticas", margin, y);
 
-  // Título
-  doc.setFontSize(18);
-  doc.text('Reporte de Estadísticas - Stockly', margin, cursorY);
-  doc.setFontSize(10);
-  doc.setTextColor(100);
-  doc.text(`Generado: ${new Date().toLocaleString()}`, margin, cursorY + 16);
-  cursorY += 36;
+      y += 6;
+      doc.setFontSize(9);
+      doc.setTextColor(120, 120, 120);
+      doc.setFont(undefined, "normal");
+      doc.text(
+        `Generado: ${new Date().toLocaleDateString("es-ES", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        })}`,
+        margin,
+        y
+      );
 
-  // Indicadores: disponibilidad, valor total, edad promedio
-  doc.setFontSize(11);
-  doc.setTextColor(30);
-  const ind = this.stats.indicators || {};
-  const indicators = [
-    ['Disponibilidad stock (%)', (ind.availability ?? '-')],
-    ['Valor total inventario', (ind.total_value != null) ? `$ ${Number(ind.total_value).toFixed(2)}` : '-'],
-    ['Edad promedio de lotes (años)', (ind.avg_age ?? '-')]
-  ];
+      y += 15;
+      doc.setLineWidth(0.5);
+      doc.setDrawColor(200, 200, 200);
+      doc.line(margin, y, pageWidth - margin, y);
+      y += 10;
 
-  // dibujar indicadores en línea (3 columnas)
-  const colW = (pageWidth - margin * 2) / 3;
-  indicators.forEach((it, idx) => {
-    const x = margin + idx * colW;
-    doc.setFontSize(12);
-    doc.text(String(it[1]), x, cursorY);
-    doc.setFontSize(9);
-    doc.setTextColor(90);
-    doc.text(String(it[0]), x, cursorY + 14);
-  });
-  doc.setTextColor(0);
-  cursorY += 40;
+      const ind = this.stats.indicators || {};
 
-  // FUNC: agregar imagen escalada manteniendo ratio
-  const addImage = (imgData, maxWidthPt = pageWidth - margin * 2) => {
-    if (!imgData) return 0;
-    const img = new Image();
-    img.src = imgData;
-    // tamaño px a pt ~ 0.75 (72dpi/96dpi) — pero jsPDF acepta imagen con width en pts
-    // calculamos basados en imagen natural cuando cargue, pero toBase64Image suele dar buen tamaño
-    const w = Math.min(maxWidthPt, 440);
-    const h = (img.naturalHeight / img.naturalWidth) * w || (w * 0.5);
-    try {
-      doc.addImage(imgData, 'JPEG', margin, cursorY, w, h);
-    } catch (e) {
-      // fallback: intentar sin especificar tamaño
-      try { doc.addImage(imgData, 'JPEG', margin, cursorY); } catch (e2) { console.warn('addImage failed', e2); }
-    }
-    return (h + 10);
-  };
+      doc.setFontSize(11);
+      doc.setTextColor(100, 100, 100);
+      doc.setFont(undefined, "bold");
+      doc.text("INDICADORES PRINCIPALES", margin, y);
+      y += 8;
 
-  // Añadir tabla: distribución por categoría (usando autotable si disponible)
-  const donut = this.stats.donut || { labels: [], data: [] };
-  const totalCat = (donut.data || []).reduce((s, x) => s + (Number(x) || 0), 0) || 0;
-  const catRows = (donut.labels || []).map((lab, idx) => {
-    const v = Number(donut.data[idx] || 0);
-    const pct = totalCat ? ((v / totalCat) * 100).toFixed(2) + '%' : '0.00%';
-    return [lab, v, pct];
-  });
+      const indicators = [
+        {
+          label: "Disponibilidad",
+          value: `${ind.availability || 0}%`,
+          color: [20, 184, 166],
+        },
+        {
+          label: "Valor Total Inventario",
+          value: `$${Number(ind.total_value || 0).toLocaleString("es-CL")}`,
+          color: [249, 115, 22],
+        },
+        {
+          label: "Edad Promedio Lotes",
+          value: `${ind.avg_age || 0} años`,
+          color: [139, 92, 246],
+        },
+      ];
 
-  // si existe autotable, usarla para tablas bien formateadas
-  if (doc.autoTable) {
-    doc.autoTable({
-      startY: cursorY,
-      head: [['Categoría', 'Count', '%']],
-      body: catRows,
-      theme: 'striped',
-      styles: { fontSize: 9 },
-      margin: { left: margin, right: margin }
-    });
-    cursorY = doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : cursorY + 80;
-  } else {
-    // fallback: dibujar tabla simple
-    doc.setFontSize(10);
-    doc.text('Distribución por Categoría', margin, cursorY);
-    cursorY += 14;
-    catRows.forEach(r => {
-      doc.text(`${r[0]} — ${r[1]} — ${r[2]}`, margin, cursorY);
-      cursorY += 12;
-    });
-    cursorY += 6;
-  }
+      const boxWidth = (contentWidth - 10) / 3;
+      const boxHeight = 25;
 
-  // Incluir imagen del donut por debajo si hay espacio, o en nueva página
-  if (donutImg) {
-    if (cursorY + 220 > doc.internal.pageSize.getHeight() - margin) { doc.addPage(); cursorY = margin; }
-    cursorY += addImage(donutImg);
-  }
+      indicators.forEach((item, idx) => {
+        const x = margin + idx * (boxWidth + 5);
 
-  // Top proveedores
-  if (doc.autoTable) {
-    const bar = this.stats.bar || { labels: [], datasets: [] };
-    const barRows = [];
-    for (let i=0;i<(bar.labels||[]).length;i++) {
-      const label = bar.labels[i];
-      const pedidosCount = (bar.datasets[0] && bar.datasets[0].data[i]) || 0;
-      const qty = (bar.datasets[1] && bar.datasets[1].data[i]) || 0;
-      barRows.push([label, pedidosCount, qty]);
-    }
-    doc.autoTable({
-      startY: cursorY,
-      head: [['Proveedor','Nº Pedidos','Cantidad total']],
-      body: barRows,
-      theme: 'striped',
-      styles: { fontSize: 9 },
-      margin: { left: margin, right: margin }
-    });
-    cursorY = doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : cursorY + 80;
-  } else {
-    doc.setFontSize(11);
-    doc.text('Top Proveedores', margin, cursorY);
-    cursorY += 14;
-  }
+        doc.setFillColor(item.color[0], item.color[1], item.color[2], 0.1);
+        doc.roundedRect(x, y, boxWidth, boxHeight, 2, 2, "F");
 
-  // imagen bar
-  if (barImg) {
-    if (cursorY + 220 > doc.internal.pageSize.getHeight() - margin) { doc.addPage(); cursorY = margin; }
-    cursorY += addImage(barImg);
-  }
+        doc.setFontSize(20);
+        doc.setTextColor(item.color[0], item.color[1], item.color[2]);
+        doc.setFont(undefined, "bold");
+        doc.text(item.value, x + 3, y + 12);
 
-  // Movimientos mensuales
-  if (doc.autoTable) {
-    const line = this.stats.line || { labels: [], datasets: [] };
-    const mRows = (line.labels || []).map((lab, idx) => {
-      return [lab, (line.datasets[0] && line.datasets[0].data[idx]) || 0, (line.datasets[1] && line.datasets[1].data[idx]) || 0];
-    });
-    doc.autoTable({
-      startY: cursorY,
-      head: [['Mes','Entradas','Salidas']],
-      body: mRows,
-      theme: 'striped',
-      styles: { fontSize: 9 },
-      margin: { left: margin, right: margin }
-    });
-    cursorY = doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : cursorY + 80;
-  } else {
-    doc.setFontSize(11);
-    doc.text('Movimientos Mensuales (Entradas/Salidas)', margin, cursorY);
-    cursorY += 14;
-  }
+        doc.setFontSize(8);
+        doc.setTextColor(100, 100, 100);
+        doc.setFont(undefined, "normal");
+        doc.text(item.label, x + 3, y + 19);
+      });
 
-  // imagen line
-  if (lineImg) {
-    if (cursorY + 220 > doc.internal.pageSize.getHeight() - margin) { doc.addPage(); cursorY = margin; }
-    cursorY += addImage(lineImg);
-  }
+      y += boxHeight + 12;
 
-  // Footer
-  if (cursorY + 40 > doc.internal.pageSize.getHeight() - margin) { doc.addPage(); cursorY = margin; }
-  doc.setFontSize(9);
-  doc.setTextColor(120);
-  doc.text('Reporte generado desde Stockly — datos extraídos del sistema.', margin, doc.internal.pageSize.getHeight() - margin);
+      doc.setFontSize(11);
+      doc.setTextColor(100, 100, 100);
+      doc.setFont(undefined, "bold");
+      doc.text("DISTRIBUCIÓN POR CATEGORÍA", margin, y);
+      y += 5;
 
-  // Guardar
-  try {
-    doc.save(`reporte_estadisticas_${new Date().toISOString().slice(0,10)}.pdf`);
-    console.log('[reportes] PDF guardado con jsPDF');
-  } catch (e) {
-    console.error('[reportes] error guardando PDF con jsPDF', e);
-    // fallback a html2pdf si está disponible
-    if (window.html2pdf) {
-      console.log('[reportes] fallback a html2pdf porque jsPDF falló');
-      return await this._downloadWithHtml2pdfFallback();
-    } else {
-      alert('Error generando PDF: ' + (e && e.message ? e.message : e));
-    }
-  }
-},
-// Helper fallback: usa html2pdf si jsPDF no funciona o falta
-async _downloadWithHtml2pdfFallback() {
-  try {
-    // reusar el método original que crea container y utiliza html2pdf (tu versión anterior)
-    console.log('[reportes] fallback html2pdf invoked');
-    // llamada simple: exporta el div principal (puede fallar si canvases no se rasterizan)
-    await window.html2pdf().from(this.$el).set({
-      margin: [0.3,0.25,0.3,0.25],
-      filename: `reporte_estadisticas_${new Date().toISOString().slice(0,10)}.pdf`,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true, logging: false },
-      jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
-    }).save();
-    console.log('[reportes] html2pdf fallback finished');
-  } catch (e) {
-    console.error('[reportes] html2pdf fallback failed', e);
-    alert('No se pudo generar el PDF con ninguno de los métodos disponibles. Revisa la consola para más info.');
-  }
-}
-  }
+      if (doc.autoTable) {
+        const donut = this.stats.donut || { labels: [], data: [] };
+        const totalCat =
+          donut.data.reduce((s, x) => s + (Number(x) || 0), 0) || 0;
+        const catRows = donut.labels.map((lab, idx) => {
+          const v = Number(donut.data[idx] || 0);
+          const pct = totalCat ? ((v / totalCat) * 100).toFixed(1) + "%" : "0%";
+          return [lab, v, pct];
+        });
 
-  
+        doc.autoTable({
+          startY: y,
+          head: [["Categoría", "Productos", "Porcentaje"]],
+          body: catRows,
+          theme: "striped",
+          headStyles: {
+            fillColor: [20, 184, 166],
+            fontSize: 10,
+            fontStyle: "bold",
+          },
+          styles: {
+            fontSize: 9,
+            cellPadding: 3,
+          },
+          margin: { left: margin, right: margin },
+          columnStyles: {
+            1: { halign: "center" },
+            2: { halign: "center" },
+          },
+        });
+        y = doc.lastAutoTable.finalY + 10;
+      }
+
+      if (this.donutChart && this.donutChart.canvas) {
+        const imgData = this.chartToDataURL(this.donutChart);
+        if (imgData) {
+          const imgWidth = contentWidth * 0.6;
+          const imgHeight = imgWidth * 0.6;
+
+          if (y + imgHeight > pageHeight - margin) {
+            doc.addPage();
+            y = margin;
+          }
+
+          doc.addImage(
+            imgData,
+            "PNG",
+            margin + (contentWidth - imgWidth) / 2,
+            y,
+            imgWidth,
+            imgHeight
+          );
+          y += imgHeight + 12;
+        }
+      }
+
+      if (y > pageHeight - 50) {
+        doc.addPage();
+        y = margin;
+      }
+
+      doc.setFontSize(11);
+      doc.setTextColor(100, 100, 100);
+      doc.setFont(undefined, "bold");
+      doc.text("TOP PROVEEDORES", margin, y);
+      y += 5;
+
+      if (doc.autoTable) {
+        const bar = this.stats.bar || { labels: [], datasets: [] };
+        const barRows = bar.labels.map((label, i) => {
+          const pedidos = (bar.datasets[0] && bar.datasets[0].data[i]) || 0;
+          const cantidad = (bar.datasets[1] && bar.datasets[1].data[i]) || 0;
+          return [label, pedidos, cantidad];
+        });
+
+        doc.autoTable({
+          startY: y,
+          head: [["Proveedor", "N° Pedidos", "Cantidad Total"]],
+          body: barRows,
+          theme: "striped",
+          headStyles: {
+            fillColor: [249, 115, 22],
+            fontSize: 10,
+            fontStyle: "bold",
+          },
+          styles: {
+            fontSize: 9,
+            cellPadding: 3,
+          },
+          margin: { left: margin, right: margin },
+          columnStyles: {
+            1: { halign: "center" },
+            2: { halign: "center" },
+          },
+        });
+        y = doc.lastAutoTable.finalY + 10;
+      }
+
+      if (this.barChart && this.barChart.canvas) {
+        const imgData = this.chartToDataURL(this.barChart);
+        if (imgData) {
+          const imgWidth = contentWidth * 0.7;
+          const imgHeight = imgWidth * 0.5;
+
+          if (y + imgHeight > pageHeight - margin) {
+            doc.addPage();
+            y = margin;
+          }
+
+          doc.addImage(imgData, "PNG", margin, y, imgWidth, imgHeight);
+          y += imgHeight + 12;
+        }
+      }
+
+      if (y > pageHeight - 50) {
+        doc.addPage();
+        y = margin;
+      }
+
+      doc.setFontSize(11);
+      doc.setTextColor(100, 100, 100);
+      doc.setFont(undefined, "bold");
+      doc.text("TENDENCIA DE MOVIMIENTOS", margin, y);
+      y += 5;
+
+      if (doc.autoTable) {
+        const line = this.stats.line || { labels: [], datasets: [] };
+        const lineRows = line.labels.map((lab, idx) => {
+          const entradas =
+            (line.datasets[0] && line.datasets[0].data[idx]) || 0;
+          const salidas = (line.datasets[1] && line.datasets[1].data[idx]) || 0;
+          return [lab, entradas, salidas];
+        });
+
+        doc.autoTable({
+          startY: y,
+          head: [["Mes", "Entradas", "Salidas"]],
+          body: lineRows,
+          theme: "striped",
+          headStyles: {
+            fillColor: [59, 130, 246],
+            fontSize: 10,
+            fontStyle: "bold",
+          },
+          styles: {
+            fontSize: 9,
+            cellPadding: 3,
+          },
+          margin: { left: margin, right: margin },
+          columnStyles: {
+            1: { halign: "center" },
+            2: { halign: "center" },
+          },
+        });
+        y = doc.lastAutoTable.finalY + 10;
+      }
+
+      if (this.lineChart && this.lineChart.canvas) {
+        const imgData = this.chartToDataURL(this.lineChart);
+        if (imgData) {
+          const imgWidth = contentWidth;
+          const imgHeight = imgWidth * 0.4;
+
+          if (y + imgHeight > pageHeight - margin) {
+            doc.addPage();
+            y = margin;
+          }
+
+          doc.addImage(imgData, "PNG", margin, y, imgWidth, imgHeight);
+        }
+      }
+
+      doc.setFontSize(8);
+      doc.setTextColor(150, 150, 150);
+      doc.text(
+        "Reporte generado desde Stockly - Sistema de Gestión de Inventario",
+        pageWidth / 2,
+        pageHeight - 10,
+        { align: "center" }
+      );
+
+      try {
+        doc.save(
+          `Reporte_Stockly_${new Date().toISOString().slice(0, 10)}.pdf`
+        );
+        console.log("PDF generado exitosamente");
+      } catch (e) {
+        console.error("Error al guardar PDF:", e);
+        alert("Error al generar PDF: " + e.message);
+      }
+    },
+
+    chartToDataURL(chart) {
+      if (!chart || !chart.canvas) return null;
+
+      const srcCanvas = chart.canvas;
+      const w = srcCanvas.width;
+      const h = srcCanvas.height;
+
+      const tmp = document.createElement("canvas");
+      tmp.width = w;
+      tmp.height = h;
+      const ctx = tmp.getContext("2d");
+
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, w, h);
+      ctx.drawImage(srcCanvas, 0, 0, w, h);
+
+      try {
+        return tmp.toDataURL("image/png", 1.0);
+      } catch (e) {
+        console.warn("Error al convertir chart a imagen:", e);
+        return null;
+      }
+    },
+  },
 });
 
-// Helper: devuelve dataURL (JPEG o PNG) de un chart con fondo blanco
-function chartToDataURLWithWhiteBg(chart, mime = 'image/jpeg', quality = 1.0) {
-  if (!chart || !chart.canvas) return null;
-
-  const srcCanvas = chart.canvas;
-  // usar width/height del canvas real (ya incluye devicePixelRatio)
-  const w = srcCanvas.width;
-  const h = srcCanvas.height;
-
-  // crear canvas temporal con mismas dimensiones
-  const tmp = document.createElement('canvas');
-  tmp.width = w;
-  tmp.height = h;
-  const ctx = tmp.getContext('2d');
-
-  // pintar fondo blanco (evita transparencia -> no aparecerá negro luego)
-  ctx.fillStyle = '#ffffff';
-  ctx.fillRect(0, 0, w, h);
-
-  // dibujar el canvas original encima
-  ctx.drawImage(srcCanvas, 0, 0, w, h);
-
-  // devolver dataURL; si pones 'image/jpeg' no habrá transparencia y fondo será blanco
-  try {
-    if (mime === 'image/jpeg' || mime === 'image/jpg') {
-      return tmp.toDataURL('image/jpeg', quality);
-    } else {
-      return tmp.toDataURL('image/png');
-    }
-  } catch (e) {
-    console.warn('chartToDataURLWithWhiteBg: fallo toDataURL, intentando png fallback', e);
-    return tmp.toDataURL('image/png');
-  }
-}
-
-
-app.mount('#vm-reportes');
+app.mount("#vm-reportes");

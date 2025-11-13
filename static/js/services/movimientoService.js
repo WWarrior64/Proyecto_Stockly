@@ -33,15 +33,37 @@ export async function createMovimiento(data) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   });
-  const json = await response.json();
+  
   if (!response.ok) {
-    throw new Error(json.description || `HTTP ${response.status}`);
+    let errorMsg = `HTTP ${response.status}`;
+    try {
+      const json = await response.json();
+      errorMsg = json.description || json.message || errorMsg;
+    } catch (e) {
+      const text = await response.text();
+      if (text.includes('login') || text.includes('Login')) {
+        errorMsg = 'Sesión expirada. Por favor, inicia sesión nuevamente.';
+      } else {
+        errorMsg = `Error del servidor: ${response.status}`;
+      }
+    }
+    throw new Error(errorMsg);
   }
-  return json;
+  
+  return await response.json();
 }
 
 export async function fetchRecepcionesPedido(pedidoId) {
   const response = await fetch(`/inventario/api/pedidos/${pedidoId}/recepciones`);
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.description || `HTTP ${response.status}`);
+  }
+  return await response.json();
+}
+
+export async function fetchCurrentUser() {
+  const response = await fetch('/inventario/api/usuario/current');
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
     throw new Error(error.description || `HTTP ${response.status}`);

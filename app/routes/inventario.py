@@ -1,7 +1,9 @@
 # app/routes/inventario.py (updated with APIs)
 # app/routes/inventario.py (parte superior)
 from flask import Blueprint, render_template, jsonify, request, abort
+from flask_login import current_user, login_required
 
+from app.decorators import api_login_required
 from app.controllers.inventario_controller import (
     get_asignacion, list_products, get_product, create_product, update_product, delete_product,
     list_asignaciones, create_asignacion, update_asignacion, delete_asignacion,
@@ -136,13 +138,35 @@ def api_list_lotes(product_id):
 
 # Crear movimiento
 @inventario_bp.route('/api/movimientos', methods=['POST'])
+@api_login_required
 def api_create_movimiento():
-    data = request.json
-    new_mov = create_movimiento(data)
-    return jsonify({'id': new_mov.movimiento_id}), 201
+    try:
+        data = request.json
+        if not data:
+            return jsonify({'description': 'No se recibieron datos'}), 400
+        
+        new_mov = create_movimiento(data)
+        return jsonify({'id': new_mov.movimiento_id}), 201
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        error_msg = str(e)
+        if hasattr(e, 'description'):
+            error_msg = e.description
+        return jsonify({'description': error_msg}), getattr(e, 'code', 500)
 
 # Recepciones de un pedido
 @inventario_bp.route('/api/pedidos/<int:pedido_id>/recepciones', methods=['GET'])
 def api_list_recepciones_pedido(pedido_id):
     recepciones = list_recepciones_pedido(pedido_id)
     return jsonify(recepciones)
+
+# Usuario actual
+@inventario_bp.route('/api/usuario/current', methods=['GET'])
+@api_login_required
+def api_current_user():
+    return jsonify({
+        'id': current_user.usuario_id,
+        'nombre': current_user.nombre if hasattr(current_user, 'nombre') else 'Usuario',
+        'email': current_user.email if hasattr(current_user, 'email') else ''
+    })

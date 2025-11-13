@@ -36,12 +36,12 @@
       <!-- SECCIÓN: Movimiento General (no recepción) -->
       <div id="mov_seccion_general" class="bg-gray-50 rounded-lg p-5 border border-gray-200">
         <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wide mb-4">Detalles del Movimiento</h3>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           <div>
             <label for="mov_producto" class="block text-sm font-semibold text-gray-800 mb-2">
               Producto <span class="text-red-500">*</span>
             </label>
-            <select id="mov_producto" required 
+            <select id="mov_producto" 
                     class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-brandOrange focus:border-transparent transition-all appearance-none bg-white">
               <option value="">Seleccione producto</option>
             </select>
@@ -59,10 +59,18 @@
             <label for="mov_cantidad" class="block text-sm font-semibold text-gray-800 mb-2">
               Cantidad <span class="text-red-500">*</span>
             </label>
-            <input id="mov_cantidad" type="number" step="1" required 
+            <input id="mov_cantidad" type="number" step="1" 
                    class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-center focus:outline-none focus:ring-2 focus:ring-brandOrange focus:border-transparent transition-all" />
             <p class="text-xs text-gray-500 mt-1">Usar valor negativo para salidas si aplica.</p>
           </div>
+        </div>
+
+        <!-- Notas para movimientos generales -->
+        <div>
+          <label for="mov_nota_general" class="block text-sm font-semibold text-gray-800 mb-2">Observaciones</label>
+          <textarea id="mov_nota_general" rows="3" 
+                    class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-brandOrange focus:border-transparent transition-all resize-none" 
+                    placeholder="Observaciones opcionales sobre este movimiento"></textarea>
         </div>
       </div>
 
@@ -76,7 +84,7 @@
             <label for="mov_pedido" class="block text-sm font-semibold text-gray-800 mb-2">
               Pedido pendiente <span class="text-red-500">*</span>
             </label>
-            <select id="mov_pedido" required 
+            <select id="mov_pedido" 
                     class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-brandOrange focus:border-transparent transition-all appearance-none bg-white">
               <option value="">Seleccione pedido</option>
             </select>
@@ -86,7 +94,7 @@
             <label for="mov_detalle" class="block text-sm font-semibold text-gray-800 mb-2">
               Ítem del pedido <span class="text-red-500">*</span>
             </label>
-            <select id="mov_detalle" required 
+            <select id="mov_detalle" 
                     class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-brandOrange focus:border-transparent transition-all appearance-none bg-white">
               <option value="">Seleccione ítem del pedido</option>
             </select>
@@ -111,7 +119,7 @@
             <label class="block text-sm font-semibold text-gray-800 mb-2">
               Cantidad recibida <span class="text-red-500">*</span>
             </label>
-            <input id="mov_cantidad_recibida" type="number" min="0" required 
+            <input id="mov_cantidad_recibida" type="number" min="0" 
                    class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-center focus:outline-none focus:ring-2 focus:ring-brandOrange focus:border-transparent transition-all">
             <p class="text-xs text-gray-500 mt-1">Máximo: cantidad solicitada</p>
           </div>
@@ -129,17 +137,17 @@
 
           <div>
             <label for="mov_fecha_fabricacion" class="block text-sm font-semibold text-gray-800 mb-2">
-              Fecha fabricación <span class="text-red-500">*</span>
+              Fecha fabricación (opcional)
             </label>
-            <input id="mov_fecha_fabricacion" type="date" required 
+            <input id="mov_fecha_fabricacion" type="date" 
                    class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-brandOrange focus:border-transparent transition-all">
           </div>
 
           <div>
             <label for="mov_fecha_vencimiento" class="block text-sm font-semibold text-gray-800 mb-2">
-              Fecha vencimiento <span class="text-red-500">*</span>
+              Fecha vencimiento (opcional)
             </label>
-            <input id="mov_fecha_vencimiento" type="date" required 
+            <input id="mov_fecha_vencimiento" type="date" 
                    class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-brandOrange focus:border-transparent transition-all">
           </div>
         </div>
@@ -154,13 +162,13 @@
 
         <div class="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-3">
           <p class="text-sm text-blue-800">
-            💡 <strong>Tip:</strong> Soporta recepciones parciales. Después de guardar, puedes usar "Agregar otro ítem" para procesar más ítems del mismo pedido.
+            💡 <strong>Tip:</strong> Usa "Agregar otro ítem" para acumular múltiples items del pedido en la tabla de abajo. Luego haz click en "Guardar" para registrar todos los items de una vez.
           </p>
         </div>
 
         <!-- Tabla de recepciones del pedido actual -->
         <div id="mov_recepciones_container" class="mt-6 hidden">
-          <h4 class="text-sm font-bold text-gray-700 uppercase tracking-wide mb-3">Recepciones Registradas</h4>
+          <h4 class="text-sm font-bold text-gray-700 uppercase tracking-wide mb-3">Items a Registrar</h4>
           <div class="overflow-auto max-h-48 border border-gray-200 rounded-lg">
             <table class="min-w-full divide-y divide-gray-200">
               <thead class="bg-gray-100 sticky top-0">
@@ -170,6 +178,7 @@
                   <th class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase">Lote</th>
                   <th class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase">Fecha</th>
                   <th class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase">Usuario</th>
+                  <th class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase">Acciones</th>
                 </tr>
               </thead>
               <tbody id="mov_recepciones_tbody" class="bg-white divide-y divide-gray-200">
@@ -188,7 +197,7 @@
         </button>
 
         <button type="button" id="mov_agregar_otro" 
-                class="px-6 py-2.5 bg-white border-2 border-brandOrange text-brandOrange rounded-lg font-medium hover:bg-brandOrange/5 transition-colors">
+                class="hidden px-6 py-2.5 bg-white border-2 border-brandOrange text-brandOrange rounded-lg font-medium hover:bg-brandOrange/5 transition-colors">
           Agregar otro ítem
         </button>
 

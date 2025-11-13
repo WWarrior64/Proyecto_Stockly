@@ -4,6 +4,7 @@ from flask import abort
 from flask_login import current_user
 from sqlalchemy import func
 from datetime import date
+from decimal import Decimal
 import random
 import string
 
@@ -96,13 +97,19 @@ def get_asignacion(product_id, proveedor_id):
     return ProductoProveedor.query.get_or_404((product_id, proveedor_id))
 
 def create_asignacion(data):
+    producto_id = data['producto_id']
+    preferido = data.get('preferido', False)
+    
+    if preferido:
+        ProductoProveedor.query.filter_by(producto_id=producto_id, preferido=True).update({'preferido': False})
+    
     new_asign = ProductoProveedor(
-        producto_id=data['producto_id'],
+        producto_id=producto_id,
         proveedor_id=data['proveedor_id'],
         precio_compra=data.get('precio_compra'),
         plazo_entrega_dias=data.get('plazo_entrega'),
         pedido_minimo=data.get('pedido_minimo', 1),
-        preferido=data.get('preferido', False)
+        preferido=preferido
     )
     db.session.add(new_asign)
     db.session.commit()
@@ -110,10 +117,19 @@ def create_asignacion(data):
 
 def update_asignacion(product_id, proveedor_id, data):
     asign = ProductoProveedor.query.get_or_404((product_id, proveedor_id))
+    preferido = data.get('preferido', asign.preferido)
+    
+    if preferido and not asign.preferido:
+        ProductoProveedor.query.filter(
+            ProductoProveedor.producto_id == product_id,
+            ProductoProveedor.proveedor_id != proveedor_id,
+            ProductoProveedor.preferido == True
+        ).update({'preferido': False})
+    
     asign.precio_compra = data.get('precio_compra', asign.precio_compra)
     asign.plazo_entrega_dias = data.get('plazo_entrega', asign.plazo_entrega_dias)
     asign.pedido_minimo = data.get('pedido_minimo', asign.pedido_minimo)
-    asign.preferido = data.get('preferido', asign.preferido)
+    asign.preferido = preferido
     db.session.commit()
     return asign
 
@@ -164,24 +180,40 @@ def list_lotes(product_id):
 
 def list_recepciones_pedido(pedido_id):
     """Lista todas las recepciones de un pedido específico"""
-    movimientos = MovimientoInventario.query.filter_by(
-        pedido_id=pedido_id,
-        tipo_movimiento='recepcion_de_pedido'
-    ).all()
-    
-    result = []
-    for m in movimientos:
-        producto = m.producto
-        result.append({
-            'movimiento_id': m.movimiento_id,
-            'producto_id': m.producto_id,
-            'producto_nombre': producto.nombre if producto else 'Desconocido',
-            'cantidad_recibida': float(m.cantidad) if m.cantidad else 0.0,
-            'fecha': m.fecha.isoformat() if m.fecha else None,
-            'lote_codigo': m.lote.lote_codigo if m.lote else None,
-            'usuario': m.usuario.nombre if m.usuario else 'Desconocido'
-        })
-    return result
+    try:
+        movimientos = MovimientoInventario.query.filter_by(
+            pedido_id=pedido_id,
+            tipo_movimiento='recepcion_de_pedido'
+        ).all()
+        
+        result = []
+        for m in movimientos:
+            try:
+                producto = m.producto
+                usuario = m.usuario
+                lote = m.lote
+                
+                result.append({
+                    'movimiento_id': m.movimiento_id,
+                    'producto_id': m.producto_id,
+                    'producto_nombre': producto.nombre if producto else 'Desconocido',
+                    'cantidad_recibida': float(m.cantidad) if m.cantidad else 0.0,
+                    'fecha': m.fecha.isoformat() if m.fecha else None,
+                    'lote_codigo': lote.lote_codigo if lote else None,
+                    'usuario': usuario.nombre if usuario else 'Desconocido'
+                })
+            except Exception as e:
+                print(f"Error procesando movimiento {m.movimiento_id}: {str(e)}")
+                import traceback
+                traceback.print_exc()
+                continue
+                
+        return result
+    except Exception as e:
+        print(f"Error en list_recepciones_pedido: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return []
 
 def create_movimiento(data):
     tipo = data.get('tipo_movimiento')
@@ -198,12 +230,15 @@ def create_movimiento(data):
         abort(400, description="Tipo de movimiento inválido")
 
     try:
-        cantidad = float(data.get('cantidad', 0))
-    except (ValueError, TypeError):
+        cantidad = Decimal(str(data.get('cantidad', 0)))
+    except (ValueError, TypeError, Exception):
         abort(400, description="Cantidad inválida")
 
-    if cantidad <= 0:
-        abort(400, description="La cantidad debe ser mayor que 0")
+    if cantidad == 0:
+        abort(400, description="La cantidad no puede ser 0")
+    
+    if tipo in ['recepcion_de_pedido', 'entrada', 'actualizacion_de_stock'] and cantidad <= 0:
+        abort(400, description="La cantidad debe ser mayor que 0 para este tipo de movimiento")
 
     producto = Producto.query.get(producto_id)
     if not producto:
@@ -219,13 +254,13 @@ def create_movimiento(data):
             usuario_id=usuario_id,
             nota=nota
         )
-        db.session.add(mov)
 
         if tipo == 'recepcion_de_pedido':
             if not pedido_id:
                 abort(400, description="Pedido requerido para recepción")
             
-            lote_codigo = data.get('lote_codigo') or generate_lote_codigo()
+            lote_codigo_input = data.get('lote_codigo', '').strip()
+            lote_codigo = lote_codigo_input if lote_codigo_input else generate_lote_codigo()
             fecha_fabricacion_str = data.get('fecha_fabricacion')
             fecha_vencimiento_str = data.get('fecha_vencimiento')
 
@@ -253,10 +288,15 @@ def create_movimiento(data):
                     MovimientoInventario.pedido_id == pedido_id,
                     MovimientoInventario.producto_id == producto_id,
                     MovimientoInventario.tipo_movimiento == 'recepcion_de_pedido'
-                ).scalar() or 0
+                ).scalar() or Decimal('0')
                 
-                if recibido_previo + cantidad > detalle.cantidad_solicitada:
-                    abort(400, description="Cantidad recibida excede lo solicitado")
+                total_recibido = Decimal(str(recibido_previo)) + cantidad
+                cantidad_solicitada = Decimal(str(detalle.cantidad_solicitada))
+                
+                print(f"DEBUG: Recibido previo: {recibido_previo}, Cantidad actual: {cantidad}, Total: {total_recibido}, Solicitado: {cantidad_solicitada}")
+                
+                if total_recibido > cantidad_solicitada:
+                    abort(400, description=f"Cantidad recibida total ({total_recibido}) excede lo solicitado ({cantidad_solicitada}). Ya recibido: {recibido_previo}")
 
             lote = Lote(
                 producto_id=producto_id,
@@ -270,6 +310,9 @@ def create_movimiento(data):
             stock = Stock(lote_id=lote.lote_id, cantidad=cantidad, stock_minimo=0)
             db.session.add(stock)
             mov.lote_id = lote.lote_id
+            
+            db.session.add(mov)
+            db.session.flush()
 
             detalles = DetallePedido.query.filter_by(pedido_id=pedido_id).all()
             complete = True
@@ -278,14 +321,14 @@ def create_movimiento(data):
                     MovimientoInventario.pedido_id == pedido_id,
                     MovimientoInventario.producto_id == d.producto_id,
                     MovimientoInventario.tipo_movimiento == 'recepcion_de_pedido'
-                ).scalar() or 0
-                if received < d.cantidad_solicitada:
+                ).scalar() or Decimal('0')
+                if Decimal(str(received)) < Decimal(str(d.cantidad_solicitada)):
                     complete = False
                     break
-            if complete:
-                pedido = Pedido.query.get(pedido_id)
-                if pedido:
-                    pedido.estado = 'entregado'
+            
+            pedido = Pedido.query.get(pedido_id)
+            if pedido and complete and pedido.estado != 'entregado':
+                pedido.estado = 'entregado'
 
         else:
             if not lote_id:
@@ -312,16 +355,21 @@ def create_movimiento(data):
                 if not stock:
                     abort(404, description="Stock no encontrado")
                 
-                if stock.cantidad + cantidad < 0:
+                nueva_cantidad = Decimal(str(stock.cantidad)) + cantidad
+                if nueva_cantidad < 0:
                     abort(400, description="Stock insuficiente para esta operación")
                     
-                stock.cantidad += cantidad
+                stock.cantidad = nueva_cantidad
                 mov.lote_id = lote_id
+            
+            db.session.add(mov)
 
         db.session.commit()
         return mov
     except Exception as e:
         db.session.rollback()
+        import traceback
+        traceback.print_exc()
         if hasattr(e, 'code'):
             raise
         abort(500, description=f"Error al crear movimiento: {str(e)}")

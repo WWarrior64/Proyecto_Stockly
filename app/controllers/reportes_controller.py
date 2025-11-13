@@ -19,10 +19,10 @@ def get_stats():
     }
 
 def get_indicators():
-    # Stock availability percentage (stocks with cantidad > 0)
-    total_stocks = db.session.query(func.count(Stock.stock_id)).scalar() or 0
-    available_stocks = db.session.query(func.count(Stock.stock_id)).filter(Stock.cantidad > 0).scalar() or 0
-    availability = round((available_stocks / total_stocks * 100) if total_stocks else 0)
+    # Disponibilidad basada en productos activos
+    total_productos = db.session.query(func.count(Producto.producto_id)).scalar() or 0
+    productos_activos = db.session.query(func.count(Producto.producto_id)).filter(Producto.estado == 'activo').scalar() or 0
+    availability = round((productos_activos / total_productos * 100) if total_productos else 0)
 
     # Total inventory value (FIXED: Use select_from and relationships)
     total_value = db.session.query(func.sum(Producto.preciounitario * Stock.cantidad)) \
@@ -84,12 +84,12 @@ def get_monthly_movements():
         labels.append(label)
 
         entry_count = db.session.query(func.count(MovimientoInventario.movimiento_id)).filter(
-            MovimientoInventario.tipo_movimiento.like('entrada%'),
+            MovimientoInventario.tipo_movimiento.in_(['entrada', 'recepcion_de_pedido', 'actualizacion_de_stock']),
             MovimientoInventario.fecha.between(month_start, month_end)
         ).scalar() or 0
 
         exit_count = db.session.query(func.count(MovimientoInventario.movimiento_id)).filter(
-            MovimientoInventario.tipo_movimiento.like('salida%'),
+            MovimientoInventario.tipo_movimiento.in_(['salida']),
             MovimientoInventario.fecha.between(month_start, month_end)
         ).scalar() or 0
 
