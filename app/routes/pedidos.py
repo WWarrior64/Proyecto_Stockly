@@ -1,7 +1,7 @@
 # app/routes/pedidos.py
 from flask import Blueprint, flash, redirect, render_template, request, jsonify, url_for
 from flask_login import login_required, current_user
-from app.controllers.pedido_controller import list_pedidos, get_pedido, create_pedido, update_pedido, list_proveedores, list_tipo_pagos, list_productos, get_producto_proveedor_precio, registrar_recepcion
+from app.controllers.pedido_controller import list_pedidos, get_pedido, create_pedido, update_pedido, list_proveedores, list_tipo_pagos, list_productos, list_productos_by_proveedor, get_producto_proveedor_precio, registrar_recepcion
 import datetime
 
 pedidos_bp = Blueprint('pedidos', __name__, url_prefix='/pedidos')
@@ -62,6 +62,11 @@ def api_list_tipo_pagos():
 @login_required
 def api_list_productos():
     return jsonify(list_productos())
+
+@pedidos_bp.route('/api/productos_por_proveedor/<int:proveedor_id>', methods=['GET'])
+@login_required
+def api_list_productos_por_proveedor(proveedor_id):
+    return jsonify(list_productos_by_proveedor(proveedor_id))
 
 @pedidos_bp.route('/api/producto_proveedor_precio', methods=['GET'])
 @login_required

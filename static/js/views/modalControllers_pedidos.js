@@ -56,6 +56,8 @@ window.initCrearEditarPedido = async function initCrearEditarPedido(container, {
 
   // obtener listados (proveedores, productos, tipoPagos)
   let cachedProductos = [];
+  let allProductos = [];
+  
   async function loadAuxData() {
     try {
       const provs = await window.pedidosService.listProveedores();
@@ -72,11 +74,46 @@ window.initCrearEditarPedido = async function initCrearEditarPedido(container, {
     }
 
     try {
-      cachedProductos = await window.pedidosService.listProductos();
+      allProductos = await window.pedidosService.listProductos();
+      cachedProductos = allProductos;
     } catch (e) {
       console.error('Error cargando productos', e);
       cachedProductos = [];
+      allProductos = [];
     }
+  }
+  
+  // Función para cargar productos filtrados por proveedor
+  async function loadProductosByProveedor(proveedorId) {
+    if (!proveedorId) {
+      cachedProductos = allProductos;
+      return;
+    }
+    
+    try {
+      cachedProductos = await fetch(`/pedidos/api/productos_por_proveedor/${proveedorId}`, { 
+        credentials: 'same-origin' 
+      }).then(r => r.ok ? r.json() : []);
+    } catch (e) {
+      console.error('Error cargando productos por proveedor', e);
+      cachedProductos = allProductos;
+    }
+    
+    // Actualizar todos los select de productos existentes
+    updateAllProductSelects();
+  }
+  
+  // Función para actualizar todos los select de productos en las filas
+  function updateAllProductSelects() {
+    const detalleRows = tbody.querySelectorAll('.detalle-row');
+    detalleRows.forEach(row => {
+      const selectProd = row.querySelector('.detalle-producto');
+      if (selectProd) {
+        const currentValue = selectProd.value;
+        fillSelect(selectProd, cachedProductos, 'Seleccione producto');
+        selectProd.value = currentValue; // Mantener selección actual si sigue disponible
+      }
+    });
   }
 
   // calculos
@@ -208,6 +245,12 @@ window.initCrearEditarPedido = async function initCrearEditarPedido(container, {
 
   // agregar listeners
   btnAgregar && btnAgregar.addEventListener('click', () => addDetalleRow());
+  
+  // Listener para cambio de proveedor
+  selectProveedor && selectProveedor.addEventListener('change', (e) => {
+    const proveedorId = e.target.value;
+    loadProductosByProveedor(proveedorId);
+  });
 
   // cancelar / close
   btnCancelar.forEach(b => b.addEventListener('click', (ev) => {

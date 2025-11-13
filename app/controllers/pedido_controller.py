@@ -114,6 +114,20 @@ def list_productos():
     productos = Producto.query.all()
     return [{'id': p.producto_id, 'nombre': p.nombre, 'preciounitario': p.preciounitario} for p in productos]
 
+def list_productos_by_proveedor(proveedor_id):
+    """Lista productos asociados a un proveedor específico"""
+    productos_proveedor = ProductoProveedor.query.filter_by(proveedor_id=proveedor_id).all()
+    result = []
+    for pp in productos_proveedor:
+        producto = pp.producto
+        if producto:
+            result.append({
+                'id': producto.producto_id,
+                'nombre': producto.nombre,
+                'preciounitario': float(producto.preciounitario) if producto.preciounitario else 0
+            })
+    return result
+
 def get_producto_proveedor_precio(producto_id, proveedor_id):
     pp = ProductoProveedor.query.filter_by(producto_id=producto_id, proveedor_id=proveedor_id).first()
     if pp and pp.precio_compra is not None:
