@@ -95,7 +95,7 @@ async function renderAsignaciones(productId) {
     tbody.querySelectorAll('.edit-btn').forEach(btn => {
       btn.addEventListener('click', async (e) => {
         try {
-          const provId = e.target.dataset.proveedorId;
+          const provId = e.currentTarget.dataset.proveedorId;
           const asign = await fetchAsignacion(productId, provId);
           const selectProveedor = document.getElementById('ap_proveedor');
           selectProveedor.value = asign.proveedor_id;
@@ -114,7 +114,7 @@ async function renderAsignaciones(productId) {
       btn.addEventListener('click', async (e) => {
         if (confirm('¿Seguro que desea eliminar esta asignación?')) {
           try {
-            const provId = e.target.dataset.proveedorId;
+            const provId = e.currentTarget.dataset.proveedorId;
             await deleteAsignacion(productId, provId);
             await renderAsignaciones(productId);
           } catch (error) {

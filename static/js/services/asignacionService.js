@@ -59,5 +59,9 @@ export async function deleteAsignacion(producto_id, proveedor_id) {
     const error = await response.json().catch(() => ({}));
     throw new Error(error.description || `HTTP ${response.status}`);
   }
+  // 204 No Content doesn't have a response body
+  if (response.status === 204) {
+    return {};
+  }
   return await response.json();
 }
