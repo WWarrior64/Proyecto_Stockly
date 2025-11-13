@@ -235,13 +235,27 @@ window.initCrearEditarPedido = async function initCrearEditarPedido(container, {
     }
   });
 
+  // Función para generar código de pedido automático
+  function generatePedidoCodigo() {
+    const timestamp = Date.now();
+    const random = Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
+    return `PED-${random}`;
+  }
+
   // submit
   form && form.addEventListener('submit', async (ev) => {
     ev.preventDefault();
     clearMsgs();
 
     // validaciones básicas
-    const codigo = inputCodigo ? inputCodigo.value.trim() : '';
+    let codigo = inputCodigo ? inputCodigo.value.trim() : '';
+    
+    // Si el código está vacío, generar uno automáticamente
+    if (!codigo) {
+      codigo = generatePedidoCodigo();
+      if (inputCodigo) inputCodigo.value = codigo;
+    }
+    
     const proveedorId = selectProveedor ? selectProveedor.value : '';
     if (!proveedorId) return showError('Seleccione un proveedor.');
 

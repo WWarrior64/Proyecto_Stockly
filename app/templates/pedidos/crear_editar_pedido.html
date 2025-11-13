@@ -12,17 +12,16 @@
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <!-- Código -->
-        <div>
-          <label class="block text-sm font-semibold text-gray-800 mb-2">
-            Código <span class="text-red-500">*</span>
-          </label>
-          <input id="pedido_codigo"
-                 name="codigo"
-                 type="text"
-                 required
-                 class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-brandOrange focus:border-transparent transition-all"
-                 placeholder="Ej: PED-001">
-        </div>
+         <div>
+           <label class="block text-sm font-semibold text-gray-800 mb-2">
+             Código <span class="text-gray-500 text-xs">(Auto-generado si está vacío)</span>
+           </label>
+           <input id="pedido_codigo"
+                  name="codigo"
+                  type="text"
+                  class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-brandOrange focus:border-transparent transition-all"
+                  placeholder="Dejar vacío para auto-generar">
+         </div>
 
         <!-- Fecha -->
         <div>
