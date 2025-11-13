@@ -12,10 +12,10 @@ class Producto(db.Model):
     estado = db.Column(db.String(40))
     categoria_id = db.Column(db.Integer, db.ForeignKey('Categoria.categoria_id', onupdate='CASCADE', ondelete='SET NULL'))
 
-    producto_proveedores = db.relationship('ProductoProveedor', backref='producto', lazy=True)
-    lotes = db.relationship('Lote', backref='producto', lazy=True)
-    detalle_pedidos = db.relationship('DetallePedido', backref='producto', lazy=True)
-    movimientos_inventario = db.relationship('MovimientoInventario', backref='producto', lazy=True)
+    producto_proveedores = db.relationship('ProductoProveedor', backref='producto', lazy=True, cascade='all, delete-orphan')
+    lotes = db.relationship('Lote', backref='producto', lazy=True, cascade='all, delete-orphan')
+    detalle_pedidos = db.relationship('DetallePedido', backref='producto', lazy=True, cascade='all, delete-orphan')
+    movimientos_inventario = db.relationship('MovimientoInventario', backref='producto', lazy=True, cascade='all, delete-orphan')
 
     def __repr__(self):
         return f"<Producto {self.nombre}>"
