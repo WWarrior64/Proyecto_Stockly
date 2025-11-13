@@ -179,7 +179,7 @@
                 <span class="text-gray-700" v-text="pedido.proveedor_nombre || '—'"></span>
               </td>
               <td class="px-4 py-3">
-                <span class="text-gray-700" v-text="pedido.fecha || '—'"></span>
+                <span class="text-gray-700" v-text="formatDate(pedido.fecha)"></span>
               </td>
               <td class="px-4 py-3 text-center">
                 <span class="inline-flex items-center justify-center w-12 font-bold text-gray-900" v-text="Math.round(pedido.cantidad) ?? 0"></span>

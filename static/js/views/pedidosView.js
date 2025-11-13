@@ -112,6 +112,23 @@
         return n.toFixed(2);
       },
 
+      formatDate(dateStr) {
+        if (!dateStr) return '—';
+        try {
+          const date = new Date(dateStr);
+          if (isNaN(date)) return '—';
+          return date.toLocaleDateString('es-ES', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+        } catch (e) {
+          return '—';
+        }
+      },
+
       async loadProveedores() {
         try {
           const provs = await window.pedidosService.listProveedores();
