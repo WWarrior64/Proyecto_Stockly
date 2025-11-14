@@ -18,6 +18,7 @@ inventario_bp = Blueprint('inventario', __name__, url_prefix='/inventario')
 
 @inventario_bp.route('/')
 def inventario():
+    # página completa del inventario
     return render_template('inventario/inventario.html')
 
 @inventario_bp.route('/ce_productos.html')
