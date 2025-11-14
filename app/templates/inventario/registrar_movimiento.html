@@ -1,5 +1,15 @@
 <!-- partial: registrar_movimiento.html -->
 <div data-modal-type="registrar_movimiento" data-product-id="{{ request.args.get('id','') }}">
+<<<<<<< HEAD
+  <div class="p-6 max-w-4xl">
+
+    <header class="flex items-center justify-between mb-6">
+      <h2 class="text-2xl font-bold text-gray-900">Registrar Movimiento de Inventario</h2>
+      <button id="mov_close_small" class="text-gray-400 hover:text-brandOrange transition-colors text-3xl leading-none" aria-label="Cerrar">&times;</button>
+    </header>
+
+    <form id="movimientoForm" class="space-y-6">
+=======
   <div class="p-4 max-w-3xl">
 
     <header class="flex items-center justify-between mb-4">
@@ -8,14 +18,23 @@
     </header>
 
     <form id="movimientoForm" class="space-y-4">
+>>>>>>> origin/main
 
       <!-- Tipo movimiento + Usuario -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
+<<<<<<< HEAD
+          <label for="mov_tipo" class="block text-sm font-semibold text-gray-800 mb-2">
+            Tipo de movimiento <span class="text-red-500">*</span>
+          </label>
+          <select id="mov_tipo" required 
+                  class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-brandOrange focus:border-transparent transition-all appearance-none bg-white">
+=======
           <label for="mov_tipo" class="block text-sm font-medium text-gray-700 mb-1">
             Tipo de movimiento <span class="text-red-500">*</span>
           </label>
           <select id="mov_tipo" required class="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brandOrange">
+>>>>>>> origin/main
             <option value="" disabled selected>Seleccione tipo</option>
             <option value="recepcion_de_pedido">Recepción de pedido</option>
             <option value="salida">Salida</option>
@@ -26,6 +45,67 @@
         </div>
 
         <div>
+<<<<<<< HEAD
+          <label for="mov_usuario" class="block text-sm font-semibold text-gray-800 mb-2">Usuario</label>
+          <input id="mov_usuario" type="text" readonly 
+                 class="w-full border border-gray-300 rounded-lg px-4 py-2.5 bg-gray-100 text-gray-600 cursor-not-allowed" />
+        </div>
+      </div>
+
+      <!-- SECCIÓN: Movimiento General (no recepción) -->
+      <div id="mov_seccion_general" class="bg-gray-50 rounded-lg p-5 border border-gray-200">
+        <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wide mb-4">Detalles del Movimiento</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <div>
+            <label for="mov_producto" class="block text-sm font-semibold text-gray-800 mb-2">
+              Producto <span class="text-red-500">*</span>
+            </label>
+            <select id="mov_producto" 
+                    class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-brandOrange focus:border-transparent transition-all appearance-none bg-white">
+              <option value="">Seleccione producto</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="mov_lote" class="block text-sm font-semibold text-gray-800 mb-2">Lote (opcional)</label>
+            <select id="mov_lote" 
+                    class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-brandOrange focus:border-transparent transition-all appearance-none bg-white">
+              <option value="">No asignar lote</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="mov_cantidad" class="block text-sm font-semibold text-gray-800 mb-2">
+              Cantidad <span class="text-red-500">*</span>
+            </label>
+            <input id="mov_cantidad" type="number" step="1" 
+                   class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-center focus:outline-none focus:ring-2 focus:ring-brandOrange focus:border-transparent transition-all" />
+            <p class="text-xs text-gray-500 mt-1">Usar valor negativo para salidas si aplica.</p>
+          </div>
+        </div>
+
+        <!-- Notas para movimientos generales -->
+        <div>
+          <label for="mov_nota_general" class="block text-sm font-semibold text-gray-800 mb-2">Observaciones</label>
+          <textarea id="mov_nota_general" rows="3" 
+                    class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-brandOrange focus:border-transparent transition-all resize-none" 
+                    placeholder="Observaciones opcionales sobre este movimiento"></textarea>
+        </div>
+      </div>
+
+      <!-- SECCIÓN: Recepción de Pedido (inicialmente oculta) -->
+      <div id="mov_seccion_pedido" class="hidden bg-gradient-to-br from-brandTeal/5 to-brandOrange/5 rounded-lg p-5 border-2 border-brandTeal/20">
+        <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wide mb-4">Recepción de Pedido</h3>
+        
+        <!-- Selección de pedido y detalle -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label for="mov_pedido" class="block text-sm font-semibold text-gray-800 mb-2">
+              Pedido pendiente <span class="text-red-500">*</span>
+            </label>
+            <select id="mov_pedido" 
+                    class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-brandOrange focus:border-transparent transition-all appearance-none bg-white">
+=======
           <label for="mov_usuario" class="block text-sm font-medium text-gray-700 mb-1">Usuario</label>
           <input id="mov_usuario" type="text" readonly class="w-full border rounded-md px-3 py-2 bg-gray-100 text-gray-700" />
         </div>
@@ -66,21 +146,52 @@
               Pedido (pendientes) <span class="text-red-500">*</span>
             </label>
             <select id="mov_pedido" class="w-full border rounded-md px-3 py-2">
+>>>>>>> origin/main
               <option value="">Seleccione pedido</option>
             </select>
           </div>
 
           <div>
+<<<<<<< HEAD
+            <label for="mov_detalle" class="block text-sm font-semibold text-gray-800 mb-2">
+              Ítem del pedido <span class="text-red-500">*</span>
+            </label>
+            <select id="mov_detalle" 
+                    class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-brandOrange focus:border-transparent transition-all appearance-none bg-white">
+=======
             <label for="mov_detalle" class="block text-sm font-medium text-gray-700 mb-1">
               Detalle de Pedido (ítem) <span class="text-red-500">*</span>
             </label>
             <select id="mov_detalle" class="w-full border rounded-md px-3 py-2">
+>>>>>>> origin/main
               <option value="">Seleccione ítem del pedido</option>
             </select>
           </div>
         </div>
 
         <!-- Detalles del ítem -->
+<<<<<<< HEAD
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <div>
+            <label class="block text-sm font-semibold text-gray-800 mb-2">Producto</label>
+            <input id="mov_detalle_producto" type="text" readonly 
+                   class="w-full border border-gray-300 rounded-lg px-4 py-2.5 bg-gray-100 text-gray-600">
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-gray-800 mb-2">Cantidad solicitada</label>
+            <input id="mov_detalle_solicitado" type="number" readonly 
+                   class="w-full border border-gray-300 rounded-lg px-4 py-2.5 bg-gray-100 text-gray-600 text-center font-bold">
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-gray-800 mb-2">
+              Cantidad recibida <span class="text-red-500">*</span>
+            </label>
+            <input id="mov_cantidad_recibida" type="number" min="0" 
+                   class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-center focus:outline-none focus:ring-2 focus:ring-brandOrange focus:border-transparent transition-all">
+            <p class="text-xs text-gray-500 mt-1">Máximo: cantidad solicitada</p>
+=======
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 items-end">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Producto</label>
@@ -98,10 +209,73 @@
             </label>
             <input id="mov_cantidad_recibida" type="number" min="0" class="w-full border rounded-md px-3 py-2 text-center">
             <p class="text-xs text-gray-500 mt-1">Máx: cantidad solicitada.</p>
+>>>>>>> origin/main
           </div>
         </div>
 
         <!-- Lote y fechas -->
+<<<<<<< HEAD
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label for="mov_lote_codigo" class="block text-sm font-semibold text-gray-800 mb-2">
+              Código de lote
+            </label>
+            <input id="mov_lote_codigo" type="text" placeholder="Dejar vacío para autogenerar" 
+                   class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-brandOrange focus:border-transparent transition-all">
+          </div>
+
+          <div>
+            <label for="mov_fecha_fabricacion" class="block text-sm font-semibold text-gray-800 mb-2">
+              Fecha fabricación (opcional)
+            </label>
+            <input id="mov_fecha_fabricacion" type="date" 
+                   class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-brandOrange focus:border-transparent transition-all">
+          </div>
+
+          <div>
+            <label for="mov_fecha_vencimiento" class="block text-sm font-semibold text-gray-800 mb-2">
+              Fecha vencimiento (opcional)
+            </label>
+            <input id="mov_fecha_vencimiento" type="date" 
+                   class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-brandOrange focus:border-transparent transition-all">
+          </div>
+        </div>
+
+        <!-- Nota -->
+        <div class="mt-4">
+          <label class="block text-sm font-semibold text-gray-800 mb-2">Observaciones</label>
+          <textarea id="mov_nota_pedido" rows="3" 
+                    class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-brandOrange focus:border-transparent transition-all resize-none" 
+                    placeholder="Discrepancias, observaciones, etc."></textarea>
+        </div>
+
+        <div class="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-3">
+          <p class="text-sm text-blue-800">
+            💡 <strong>Tip:</strong> Usa "Agregar otro ítem" para acumular múltiples items del pedido en la tabla de abajo. Luego haz click en "Guardar" para registrar todos los items de una vez.
+          </p>
+        </div>
+
+        <!-- Tabla de recepciones del pedido actual -->
+        <div id="mov_recepciones_container" class="mt-6 hidden">
+          <h4 class="text-sm font-bold text-gray-700 uppercase tracking-wide mb-3">Items a Registrar</h4>
+          <div class="overflow-auto max-h-48 border border-gray-200 rounded-lg">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-100 sticky top-0">
+                <tr>
+                  <th class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase">Producto</th>
+                  <th class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase">Cantidad</th>
+                  <th class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase">Lote</th>
+                  <th class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase">Fecha</th>
+                  <th class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase">Usuario</th>
+                  <th class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="mov_recepciones_tbody" class="bg-white divide-y divide-gray-200">
+                <!-- Filas cargadas por JavaScript -->
+              </tbody>
+            </table>
+          </div>
+=======
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
           <div>
             <label for="mov_lote_codigo" class="block text-sm font-medium text-gray-700 mb-1">Código de lote (opcional)</label>
@@ -126,10 +300,33 @@
 
         <div class="mt-3 text-sm text-gray-600">
           <p>Soporta recepciones parciales. Después de guardar, puedes usar "Agregar otro ítem" para procesar más ítems del mismo pedido.</p>
+>>>>>>> origin/main
         </div>
       </div>
 
       <!-- BOTONES -->
+<<<<<<< HEAD
+      <div class="flex justify-end gap-3 pt-4 border-t border-gray-200">
+        <button type="button" id="mov_cancel" 
+                class="px-6 py-2.5 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors">
+          Cancelar
+        </button>
+
+        <button type="button" id="mov_agregar_otro" 
+                class="hidden px-6 py-2.5 bg-white border-2 border-brandOrange text-brandOrange rounded-lg font-medium hover:bg-brandOrange/5 transition-colors">
+          Agregar otro ítem
+        </button>
+
+        <button type="submit" id="mov_guardar" 
+                class="px-6 py-2.5 bg-brandOrange text-white rounded-lg font-medium hover:bg-orange-600 transition-colors shadow-md hover:shadow-lg">
+          Guardar
+        </button>
+      </div>
+
+      <!-- Mensajes -->
+      <div id="mov_msg_error" class="hidden mt-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm"></div>
+      <div id="mov_msg_success" class="hidden mt-4 p-4 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm"></div>
+=======
       <div class="flex justify-end gap-3 pt-2 border-t">
         <button type="button" id="mov_cancel" class="px-4 py-2 bg-gray-200 rounded-full hover:bg-gray-300">Cancelar</button>
 
@@ -141,6 +338,7 @@
       <!-- Mensajes -->
       <div id="mov_msg_error" class="mt-2 text-sm text-red-600 hidden"></div>
       <div id="mov_msg_success" class="mt-2 text-sm text-green-600 hidden"></div>
+>>>>>>> origin/main
     </form>
 
   </div>

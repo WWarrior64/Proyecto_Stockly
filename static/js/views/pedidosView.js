@@ -1,28 +1,123 @@
+<<<<<<< HEAD
+=======
 // static/js/views/pedidosView.js
+>>>>>>> origin/main
 (() => {
   const { createApp } = Vue;
 
   const app = createApp({
+<<<<<<< HEAD
+    data() {
+      return {
+        pedidos: [],
+        proveedores: [],
+
+=======
     delimiters: ['[[', ']]'],
     data() {
       return {
         pedidos: [],
+>>>>>>> origin/main
         query: '',
         isModalOpen: false,
         modalContent: '',
         loadingModal: false,
         modalTitle: '',
+<<<<<<< HEAD
+        modalUrls: {},
+
+        // UI
+        showSettings: false,
+        showFilters: false,
+
+        // filtros
+        filters: {
+          estado: '',
+          proveedor_nombre: '',
+          fecha_from: '',
+          fecha_to: '',
+          min_total: null,
+          max_total: null
+        }
+=======
         modalUrls: {}
+>>>>>>> origin/main
       };
     },
     computed: {
       filteredPedidos() {
+<<<<<<< HEAD
+        // start with shallow copy
+        let list = Array.isArray(this.pedidos) ? this.pedidos.slice() : [];
+
+        // search query (buscar en varios campos)
+        const q = String(this.query || '').trim().toLowerCase();
+        if (q) {
+          list = list.filter(p => {
+            const codigo = String(p.codigo || '').toLowerCase();
+            const proveedor = String(p.proveedor_nombre || '').toLowerCase();
+            const fecha = String(p.fecha || '').toLowerCase();
+            const estado = String(p.estado || '').toLowerCase();
+            const totalStr = String(p.total != null ? p.total : '').toLowerCase();
+            return codigo.includes(q) || proveedor.includes(q) || fecha.includes(q) || estado.includes(q) || totalStr.includes(q);
+          });
+        }
+
+        // filtro: estado
+        if (this.filters.estado) {
+          const f = this.filters.estado.toLowerCase();
+          list = list.filter(p => String(p.estado || '').toLowerCase() === f);
+        }
+
+        // filtro: proveedor por nombre (comparamos nombres)
+        if (this.filters.proveedor_nombre) {
+          const prov = String(this.filters.proveedor_nombre).toLowerCase();
+          list = list.filter(p => String(p.proveedor_nombre || '').toLowerCase() === prov);
+        }
+
+        // filtro: rango de fechas (si p.fecha es ISO)
+        if (this.filters.fecha_from) {
+          const from = new Date(this.filters.fecha_from);
+          if (!isNaN(from)) {
+            list = list.filter(p => {
+              if (!p.fecha) return false;
+              const d = new Date(p.fecha);
+              return !isNaN(d) && d >= from;
+            });
+          }
+        }
+        if (this.filters.fecha_to) {
+          // incluir todo el día seleccionado (poner 23:59:59)
+          const toDate = new Date(this.filters.fecha_to);
+          if (!isNaN(toDate)) {
+            toDate.setHours(23,59,59,999);
+            list = list.filter(p => {
+              if (!p.fecha) return false;
+              const d = new Date(p.fecha);
+              return !isNaN(d) && d <= toDate;
+            });
+          }
+        }
+
+        // filtro: min/max total (asegurar comparaciones numéricas)
+        if (this.filters.min_total != null && this.filters.min_total !== '') {
+          const min = Number(this.filters.min_total) || 0;
+          list = list.filter(p => Number(p.total) >= min);
+        }
+        if (this.filters.max_total != null && this.filters.max_total !== '') {
+          const max = Number(this.filters.max_total) || 0;
+          list = list.filter(p => Number(p.total) <= max);
+        }
+
+        return list;
+=======
         if (!this.query) return this.pedidos;
         const q = this.query.toLowerCase();
         return this.pedidos.filter(p =>
           (p.codigo && p.codigo.toLowerCase().includes(q)) ||
           (p.proveedor_nombre && p.proveedor_nombre.toLowerCase().includes(q))
         );
+>>>>>>> origin/main
       }
     },
     async mounted() {
@@ -32,6 +127,61 @@
       } catch (e) {
         this.modalUrls = {};
       }
+<<<<<<< HEAD
+      await Promise.all([ this.loadProveedores(), this.loadPedidos() ]);
+    },
+    methods: {
+      formatCurrency(value) {
+        const n = Number(value);
+        if (!isFinite(n)) return '0.00';
+        return n.toFixed(2);
+      },
+
+      formatDate(dateStr) {
+        if (!dateStr) return '—';
+        try {
+          const date = new Date(dateStr);
+          if (isNaN(date)) return '—';
+          return date.toLocaleDateString('es-ES', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+        } catch (e) {
+          return '—';
+        }
+      },
+
+      async loadProveedores() {
+        try {
+          const provs = await window.pedidosService.listProveedores();
+          // esperar que el endpoint devuelva array {id,nombre}
+          this.proveedores = Array.isArray(provs) ? provs : [];
+        } catch (e) {
+          console.error('Error cargando proveedores', e);
+          this.proveedores = [];
+        }
+      },
+
+      async loadPedidos() {
+        try {
+          const resp = await fetch('/pedidos/api/list', { credentials: 'same-origin' });
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          const contentType = resp.headers.get('content-type') || '';
+          if (!contentType.includes('application/json')) {
+            const txt = await resp.text();
+            console.error('Respuesta no JSON en /pedidos/api/list:', txt.slice(0, 1000));
+            throw new Error('Respuesta no JSON (posible redirección a login).');
+          }
+          // convertimos total a number inmediatamente para evitar errores en render
+          const raw = await resp.json();
+          this.pedidos = Array.isArray(raw)
+            ? raw.map(p => ({ ...p, total: Number(p.total) || 0 }))
+            : [];
+          console.log('Pedidos cargados:', this.pedidos);
+=======
       await this.loadPedidos();
     },
     methods: {
@@ -45,12 +195,17 @@
               { id: 2, codigo: '002', proveedor_nombre: 'Proveedor B', fecha: '2025-11-03', cantidad: 2, total: 50.00, estado: 'entregado' }
             ];
           }
+>>>>>>> origin/main
         } catch (e) {
           console.error('Error cargando pedidos', e);
           this.pedidos = [];
         }
       },
 
+<<<<<<< HEAD
+      // abrir modal (mantengo tu lógica)
+=======
+>>>>>>> origin/main
       async openModal(name, id = null) {
         try {
           const root = document.getElementById('pedidosApp');
@@ -76,6 +231,10 @@
           this.modalContent = html;
           this.loadingModal = false;
 
+<<<<<<< HEAD
+          this.$nextTick(() => {
+            let container = this.$refs.modalRoot ? this.$refs.modalRoot.querySelector('[data-modal-type]') || this.$refs.modalRoot.firstElementChild || this.$refs.modalRoot : document.querySelector('[data-modal-type]');
+=======
           // inicializador: esperar a que v-html haya insertado el HTML
           this.$nextTick(() => {
             // ref modalRoot en tu template (v-html div debe tener ref="modalRoot")
@@ -88,19 +247,26 @@
             } else {
               container = document.querySelector('[data-modal-type]') || document.querySelector('.bg-white.rounded-lg .p-4');
             }
+>>>>>>> origin/main
 
             if (!container) {
               console.warn('initCrearEditarPedido: no se encontró contenedor tras v-html');
               return;
             }
 
+<<<<<<< HEAD
+=======
             // determinar id preferentemente desde data attribute
+>>>>>>> origin/main
             let parsedId = id;
             const dataAttrEl = container.querySelector('[data-pedido-id]') || container;
             if (dataAttrEl && dataAttrEl.dataset && dataAttrEl.dataset.pedidoId) {
               parsedId = parsedId || dataAttrEl.dataset.pedidoId || null;
             } else {
+<<<<<<< HEAD
+=======
               // fallback: extraer id del querystring del url
+>>>>>>> origin/main
               try {
                 const u = new URL(url, window.location.origin);
                 parsedId = parsedId || u.searchParams.get('id') || null;
@@ -125,15 +291,49 @@
       closeModal() {
         this.isModalOpen = false;
         this.modalContent = '';
+<<<<<<< HEAD
+      },
+
+      toggleSettings() {
+        this.showSettings = !this.showSettings;
+      },
+
+      toggleFilters() {
+        this.showFilters = !this.showFilters;
+      },
+
+      applyFilters() {
+        // la computada filteredPedidos aplicará los filtros automáticamente,
+        // esta función sirve para poder cerrar/abrir o disparar acciones extra si se quiere
+        // aquí solo forzamos una re-evaluación rápida dejando Vue reaccionar.
+        // (no hace falta nada si usamos v-model y computed)
+        // si quieres, podemos cerrar el panel:
+        this.showFilters = true;
+      },
+
+      clearFilters() {
+        this.filters = {
+          estado: '',
+          proveedor_nombre: '',
+          fecha_from: '',
+          fecha_to: '',
+          min_total: null,
+          max_total: null
+        };
+=======
+>>>>>>> origin/main
       }
     }
   });
 
+<<<<<<< HEAD
+=======
   app.mixin({
     mounted() {
       // placeholder para $refs
     }
   });
 
+>>>>>>> origin/main
   app.mount('#pedidosApp');
 })();

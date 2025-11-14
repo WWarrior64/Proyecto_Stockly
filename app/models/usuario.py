@@ -16,6 +16,7 @@ class Usuario(db.Model, UserMixin):
     rol_id = db.Column(db.Integer, db.ForeignKey('Rol.rol_id', onupdate='CASCADE', ondelete='SET NULL'))
 
     rol = db.relationship('Rol', backref='usuarios', lazy=True)
+    movimientos_inventario = db.relationship('MovimientoInventario', backref='usuario', lazy=True)
 
     def __repr__(self):
         return f"<Usuario {self.nombre} {self.apellido}>"

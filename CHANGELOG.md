@@ -20,6 +20,126 @@ Cada entrada contiene, de forma estructurada:
 
 ---
 
+## [0.6.0] - 14-11-2025
+- **Versión:** 0.6.0  
+- **Fecha:** 14-11-2025  
+- **Descripción:** Implementación completa de gestión de inventario, reportes, pedidos, proveedores y categorías con modelos de base de datos, controladores backend, refactorización de vistas con Vue.js, generación de reportes con PDF, gestión de stock y movimientos de inventario, validaciones automáticas y mejoras generales en la interfaz de usuario y experiencia de desarrollo.  
+- **Impacto:**
+  - **Nuevo:** Modelos de base de datos completos (Producto, Proveedor, Pedido, Stock, Lote, MovimientoInventario, TipoPago), API endpoints para CRUD de inventario/pedidos/reportes/proveedores/categorias, generación de reportes en PDF, gestión automática de stock bajo, formularios rediseñados.
+  - **Mejora:** Integración completa Vue.js en vistas, refactorización de servicios JavaScript, mejor manejo de errores, validaciones de datos, optimización de rendimiento, modales mejorados para creación/edición de productos y pedidos.
+  - **Operacional:** Requiere ejecución de migraciones (`flask db upgrade`), actualización de dependencias en `requirements.txt`, configuración de rutas de carga de archivos.
+
+### Detalle
+
+#### Added
+
+**Modelos de Base de Datos**
+- Modelo `Producto`: SKU, descripción, relaciones con Lote y ProductoProveedor.
+- Modelo `Proveedor`: información de proveedores, relaciones con ProductoProveedor y Pedido.
+- Modelo `ProductoProveedor`: vinculación de productos con proveedores y gestión de precios.
+- Modelo `Pedido`: gestión de pedidos con relaciones con DetallePedido, Lote y MovimientoInventario.
+- Modelo `DetallePedido`: detalles de líneas en pedidos.
+- Modelo `Stock`: gestión de niveles de inventario por Lote.
+- Modelo `Lote`: gestión de lotes de productos con relaciones con Stock y MovimientoInventario.
+- Modelo `MovimientoInventario`: rastreo de movimientos de inventario con relaciones con Producto, Lote, Pedido y Usuario.
+- Modelo `TipoPago`: tipos de pago relacionados con Pedidos.
+- Modelo `Categoria`: categorización de productos (refactorizado).
+- Archivo `app/models/__init__.py` para exportación centralizada de modelos.
+- Decorator `role_required` en `app/decorators.py` para validación de roles.
+
+**Controladores Backend**
+- `inventario_controller.py`: CRUD de productos, gestión de stock, validaciones de inventario.
+- `pedido_controller.py`: CRUD de pedidos, cálculos de totales, generación automática de códigos de pedido.
+- `reportes_controller.py`: generación de estadísticas, datos para gráficos, agregación de información.
+- `proveedor_controller.py`: CRUD de proveedores (refactorizado).
+- `categoria_controller.py`: CRUD de categorías (refactorizado).
+
+**API Endpoints**
+- `/api/productos`: CRUD de productos.
+- `/api/proveedores`: CRUD de proveedores.
+- `/api/categorias`: CRUD de categorías.
+- `/api/pedidos`: CRUD de pedidos con filtrado y búsqueda.
+- `/api/movimientos`: registro y listado de movimientos de inventario.
+- `/api/stock`: consulta de niveles de stock.
+- `/api/reportes/estadisticas`: estadísticas para dashboard.
+- `/api/reportes/productos-bajo-stock`: detección automática de productos con stock bajo.
+
+**Vistas Refactorizadas con Vue.js**
+- `inventario.html`: refactorizado con Vue.js, búsqueda, filtrado, tabla reactiva.
+- `pedidos.html`: refactorizado con Vue.js, búsqueda, filtrado, formato de fechas.
+- `reportes.html`: dashboard con gráficos Chart.js, descarga de reportes en PDF.
+- `categorias.html`: gestión de categorías con modales integrados.
+- `proveedores.html`: gestión de proveedores con modales integrados.
+- `ce_productos.html`: modal para crear/editar productos con validaciones.
+- `ap_productos.html`: modal para asignar proveedores a productos.
+- `registrar_movimiento.html`: modal para registrar movimientos de inventario con validación de stock.
+- `crear_editar_pedido.html`: modal refactorizado para crear/editar pedidos.
+- `login.html` y `register.html`: rediseño completo de formularios de autenticación.
+
+**Servicios JavaScript**
+- `asignacionService.js`: gestión de asignaciones de proveedores a productos.
+- `productService.js`: operaciones CRUD de productos.
+- `reportesService.js`: obtención de datos para reportes y estadísticas.
+- `movimientoService.js`: registro y consulta de movimientos (mejorado).
+- `pedidosService.js`: operaciones CRUD de pedidos (mejorado).
+- `categoriasService.js`: operaciones CRUD de categorías (mejorado).
+- `proveedoresService.js`: operaciones CRUD de proveedores (mejorado).
+
+**Vistas Vue.js Refactorizadas**
+- `ceProductos.js`: gestión de creación/edición de productos.
+- `apProductos.js`: gestión de asignación de proveedores.
+- `registrarMovimiento.js`: gestión de registro de movimientos con validaciones.
+- `reportes.js`: gestión completa de reportes, gráficos y descarga de PDF.
+- `inventarioView.js`: refactorizado para mejor manejo de modales y datos (mejorado).
+- `pedidosView.js`: refactorizado con búsqueda y filtrado avanzado (mejorado).
+- `categorias.js`: refactorizado (mejorado).
+- `proveedores.js`: refactorizado (mejorado).
+
+**Funcionalidades Avanzadas**
+- Generación automática de códigos de pedido con formato.
+- Detección automática de productos con stock bajo.
+- Cálculo y visualización de antigüedad promedio de pedidos.
+- Validación de stock en modales de movimiento.
+- Listado de productos por proveedor en selectores.
+- Redondeo de cantidades en tabla de pedidos.
+- Formato de fechas en visualización de pedidos.
+- Generación de reportes en PDF con jsPDF y html2pdf.
+
+**Estilos y Assets**
+- Actualización completa de `static/css/styles.css` con nuevos estilos para modales, tablas y formularios.
+- Nuevo logo `Logo_stockly-orange.png`.
+- Mejoras en responsividad y accesibilidad.
+
+**Documentación**
+- Actualización de `AGENTS.md` con guía de comandos, arquitectura y estilo de código.
+
+#### Changed
+- `app.py`: Actualización de configuración y versión.
+- Modelos en `app/models/`: refactorización de relaciones y campos.
+- Rutas en `app/routes/`: extensión con nuevos endpoints API.
+- Templates: actualización masiva para integración Vue.js y nuevos estilos.
+- `requirements.txt`: actualización de versiones de dependencias (SQLAlchemy 2.x, Flask-Migrate, jsPDF, etc.).
+- Servicios JavaScript: refactorización para mejor integración con API backend.
+- `static/css/styles.css`: reescritura completa con enfoque moderno y consistente.
+
+#### Fixed
+- Manejo de respuesta en `deleteAsignacion` y corrección de referencia a dataset en `renderAsignaciones`.
+- Cascada de eliminación en relaciones de Producto para manejo adecuado de dependencias.
+- Errores en cálculo y visualización de datos en reportes.
+- Problemas de validación en modales de pedidos y movimientos.
+- Mejora en la generación de gráficos con Chart.js.
+- Correcciones en accesibilidad de formularios y elementos interactivos.
+
+#### Removed
+- `modalControllers.js`: funcionalidad integrada en scripts de modales específicos.
+- `inventarioService.js`: reemplazado por servicios más específicos.
+- `productoService.js`: reemplazado por `productService.js`.
+- `proveedorService.js`: reemplazado por `proveedoresService.js`.
+- Código redundante y comentarios obsoletos en servicios y controladores.
+- Estilos CSS duplicados en `styles.css`.
+
+---
+
 ## [0.5.0] - 09-11-2025
 - **Versión:** 0.5.0  
 - **Fecha:** 09-11-2025  

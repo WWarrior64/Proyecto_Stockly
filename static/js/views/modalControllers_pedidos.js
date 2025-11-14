@@ -1,4 +1,5 @@
 // static/js/views/modalControllers_pedidos.js
+// Inicializador del modal Crear / Editar Pedido (archivo separado para evitar conflictos)
 window.initCrearEditarPedido = async function initCrearEditarPedido(container, { pedidoId = null, vueApp = null } = {}) {
   if (!container) {
     console.warn('initCrearEditarPedido: container no encontrado');
@@ -55,35 +56,64 @@ window.initCrearEditarPedido = async function initCrearEditarPedido(container, {
 
   // obtener listados (proveedores, productos, tipoPagos)
   let cachedProductos = [];
+  let allProductos = [];
+  
   async function loadAuxData() {
     try {
-      if (window.pedidosService && typeof window.pedidosService.listProveedores === 'function') {
-        const provs = await window.pedidosService.listProveedores();
-        fillSelect(selectProveedor, provs, 'Seleccione proveedor');
-      }
+      const provs = await window.pedidosService.listProveedores();
+      fillSelect(selectProveedor, provs, 'Seleccione proveedor');
     } catch (e) {
       console.error('Error cargando proveedores', e);
     }
 
     try {
-      if (window.pedidosService && typeof window.pedidosService.listTipoPagos === 'function') {
-        const tipos = await window.pedidosService.listTipoPagos();
-        fillSelect(selectTipoPago, tipos, 'Seleccione tipo');
-      }
+      const tipos = await window.pedidosService.listTipoPagos();
+      fillSelect(selectTipoPago, tipos, 'Seleccione tipo');
     } catch (e) {
       console.error('Error cargando tipos de pago', e);
     }
 
     try {
-      if (window.pedidosService && typeof window.pedidosService.listProductos === 'function') {
-        cachedProductos = await window.pedidosService.listProductos();
-      } else {
-        cachedProductos = [];
-      }
+      allProductos = await window.pedidosService.listProductos();
+      cachedProductos = allProductos;
     } catch (e) {
       console.error('Error cargando productos', e);
       cachedProductos = [];
+      allProductos = [];
     }
+  }
+  
+  // Función para cargar productos filtrados por proveedor
+  async function loadProductosByProveedor(proveedorId) {
+    if (!proveedorId) {
+      cachedProductos = allProductos;
+      return;
+    }
+    
+    try {
+      cachedProductos = await fetch(`/pedidos/api/productos_por_proveedor/${proveedorId}`, { 
+        credentials: 'same-origin' 
+      }).then(r => r.ok ? r.json() : []);
+    } catch (e) {
+      console.error('Error cargando productos por proveedor', e);
+      cachedProductos = allProductos;
+    }
+    
+    // Actualizar todos los select de productos existentes
+    updateAllProductSelects();
+  }
+  
+  // Función para actualizar todos los select de productos en las filas
+  function updateAllProductSelects() {
+    const detalleRows = tbody.querySelectorAll('.detalle-row');
+    detalleRows.forEach(row => {
+      const selectProd = row.querySelector('.detalle-producto');
+      if (selectProd) {
+        const currentValue = selectProd.value;
+        fillSelect(selectProd, cachedProductos, 'Seleccione producto');
+        selectProd.value = currentValue; // Mantener selección actual si sigue disponible
+      }
+    });
   }
 
   // calculos
@@ -133,15 +163,31 @@ window.initCrearEditarPedido = async function initCrearEditarPedido(container, {
     if (prefill.precio_unitario) precioEl.value = Number(prefill.precio_unitario).toFixed(2);
 
     // events
-    selectProd.addEventListener('change', () => {
+    selectProd.addEventListener('change', async () => {
       const pid = selectProd.value;
-      // try to find product price in cachedProductos
-      const prod = cachedProductos.find(p => String(p.id) === String(pid));
-      if (prod && prod.precio_unitario != null) {
-        precioEl.value = Number(prod.precio_unitario).toFixed(2);
-      } else {
-        precioEl.value = Number(0).toFixed(2);
+      const provId = selectProveedor.value;
+      let precio = 0;
+      if (provId && pid) {
+        try {
+          const resp = await fetch(`/pedidos/api/producto_proveedor_precio?producto_id=${pid}&proveedor_id=${provId}`, { credentials: 'same-origin' });
+          if (resp.ok) {
+            const data = await resp.json();
+            if (data.precio !== null && data.precio !== undefined) {
+              precio = Number(data.precio);
+            }
+          }
+        } catch (e) {
+          console.error('Error fetching precio_compra', e);
+        }
       }
+      if (precio === 0) {
+        // fallback to producto.preciounitario
+        const prod = cachedProductos.find(p => String(p.id) === String(pid));
+        if (prod && prod.preciounitario != null) {
+          precio = Number(prod.preciounitario);
+        }
+      }
+      precioEl.value = precio.toFixed(2);
       recalcRow(newRow);
       recalcTotal();
     });
@@ -169,30 +215,28 @@ window.initCrearEditarPedido = async function initCrearEditarPedido(container, {
   async function loadPedidoIfNeeded() {
     if (!pedidoId) return;
     try {
-      if (window.pedidosService && typeof window.pedidosService.get === 'function') {
-        const data = await window.pedidosService.get(pedidoId);
-        // map basic fields (ajusta según la estructura real)
-        inputCodigo && (inputCodigo.value = data.codigo || '');
-        inputFecha && (inputFecha.value = data.fecha || '');
-        selectEstado && (selectEstado.value = data.estado || 'pendiente');
-        if (selectProveedor && data.proveedor_id) selectProveedor.value = data.proveedor_id;
-        if (selectTipoPago && data.tipo_pago_id) selectTipoPago.value = data.tipo_pago_id;
+      const data = await window.pedidosService.get(pedidoId);
+      // map basic fields (ajusta según la estructura real)
+      inputCodigo && (inputCodigo.value = data.codigo || '');
+      inputFecha && (inputFecha.value = data.fecha || '');
+      selectEstado && (selectEstado.value = data.estado || 'pendiente');
+      if (selectProveedor && data.proveedor_id) selectProveedor.value = data.proveedor_id;
+      if (selectTipoPago && data.tipo_pago_id) selectTipoPago.value = data.tipo_pago_id;
 
-        // detalles si existen
-        if (Array.isArray(data.detalles) && data.detalles.length) {
-          // limpiar tbody
-          tbody.innerHTML = '';
-          for (const det of data.detalles) {
-            addDetalleRow({
-              producto_id: det.producto_id,
-              cantidad: det.cantidad || 1,
-              precio_unitario: det.precio_unitario || 0
-            });
-          }
+      // detalles si existen
+      if (Array.isArray(data.detalles) && data.detalles.length) {
+        // limpiar tbody
+        tbody.innerHTML = '';
+        for (const det of data.detalles) {
+          addDetalleRow({
+            producto_id: det.producto_id,
+            cantidad: det.cantidad || 1,
+            precio_unitario: det.precio_unitario || 0
+          });
         }
-        // mostrar registrar recepcion si aplica
-        if (btnRegistrarRecep && data.estado === 'pendiente') btnRegistrarRecep.style.display = '';
       }
+      // mostrar registrar recepcion si aplica
+      if (btnRegistrarRecep && data.estado === 'pendiente') btnRegistrarRecep.style.display = '';
     } catch (e) {
       console.error('Error cargando pedido para edición', e);
       showError('No se pudo cargar el pedido (ver consola).');
@@ -201,6 +245,12 @@ window.initCrearEditarPedido = async function initCrearEditarPedido(container, {
 
   // agregar listeners
   btnAgregar && btnAgregar.addEventListener('click', () => addDetalleRow());
+  
+  // Listener para cambio de proveedor
+  selectProveedor && selectProveedor.addEventListener('change', (e) => {
+    const proveedorId = e.target.value;
+    loadProductosByProveedor(proveedorId);
+  });
 
   // cancelar / close
   btnCancelar.forEach(b => b.addEventListener('click', (ev) => {
@@ -228,13 +278,27 @@ window.initCrearEditarPedido = async function initCrearEditarPedido(container, {
     }
   });
 
+  // Función para generar código de pedido automático
+  function generatePedidoCodigo() {
+    const timestamp = Date.now();
+    const random = Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
+    return `PED-${random}`;
+  }
+
   // submit
   form && form.addEventListener('submit', async (ev) => {
     ev.preventDefault();
     clearMsgs();
 
     // validaciones básicas
-    const codigo = inputCodigo ? inputCodigo.value.trim() : '';
+    let codigo = inputCodigo ? inputCodigo.value.trim() : '';
+    
+    // Si el código está vacío, generar uno automáticamente
+    if (!codigo) {
+      codigo = generatePedidoCodigo();
+      if (inputCodigo) inputCodigo.value = codigo;
+    }
+    
     const proveedorId = selectProveedor ? selectProveedor.value : '';
     if (!proveedorId) return showError('Seleccione un proveedor.');
 

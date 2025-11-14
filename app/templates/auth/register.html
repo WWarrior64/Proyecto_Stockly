@@ -4,110 +4,182 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Stockly - Registro</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-  <!-- Iconos de redes sociales -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 </head>
-<body class="h-screen w-screen relative">
+<body class="min-h-screen w-full relative bg-gray-900 flex flex-col">
 
-  <!-- Imagen de fondo (TÚ agregas la URL) -->
-  <div class="absolute inset-0">
+  <!-- Fondo con gradiente y efecto -->
+  <div class="absolute inset-0 z-0">
     <img src="{{ url_for('static', filename='images/fondo_stockly.png') }}"
          alt="Fondo almacén"
          class="w-full h-full object-cover">
-    <div class="absolute inset-0 bg-black bg-opacity-40"></div>
+    <div class="absolute inset-0 bg-gradient-to-br from-black/50 via-black/40 to-brandTeal/30"></div>
   </div>
 
   <!-- Contenedor principal -->
-  <div class="relative z-10 flex items-center justify-center h-full px-4">
-    <div class="w-full max-w-lg bg-[#F6FCFA] rounded-md shadow-lg p-8">
-
-
-      <!-- Título -->
-      <h2 class="text-center text-2xl font-semibold text-brandOrange mb-8 text-center">
-        Crear una cuenta
-      </h2>
-      <!-- Mensajes flash -->
-      {% include 'partials/_flash.html' %}
-      <!-- Formulario de registro -->
-      <form method="POST" action="{{ url_for('auth.register') }}" class="space-y-4">
-        <!-- Nombre -->
-        <div>
-          <input 
-            type="text" 
-            placeholder="Nombre"
-            name="nombre" required
-            class="w-full px-4 py-2 border border-blue-900 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
+  <div class="relative z-10 flex-1 flex items-center justify-center w-full px-4 py-6 md:py-8 overflow-y-auto">
+    <div class="w-full max-w-2xl">
+      <div class="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-6 md:p-10">
+        
+        <!-- Header -->
+        <div class="text-center mb-6 md:mb-8">
+          <div class="inline-block mb-4">
+            <img src="{{ url_for('static', filename='images/Logo_stockly-orange.png') }}"
+                 alt="Logo Stockly"
+                 class="w-16 md:w-20 h-auto filter brightness-0 invert hue-rotate-180 saturate-150">
+          </div>
+          <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Crear Cuenta</h2>
+          <p class="text-sm md:text-base text-gray-600">Únete a nuestro equipo y comienza a gestionar tu inventario</p>
         </div>
 
-        <!-- Apellido -->
-        <div>
-          <input 
-            type="text" 
-            placeholder="Apellido"
-            name="apellido" required
-            class="w-full px-4 py-2 border border-blue-900 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
+        <!-- Mensajes flash -->
+        {% include 'partials/_flash.html' %}
+
+        <!-- Formulario de registro -->
+        <form method="POST" action="{{ url_for('auth.register') }}" class="space-y-3 md:space-y-4">
+          
+          <!-- Grid para campos en dos columnas -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+            
+            <!-- Nombre -->
+            <div class="relative group">
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Nombre</label>
+              <div class="relative">
+                <i class="fas fa-user absolute left-4 top-1/2 transform -translate-y-1/2 text-brandOrange/60"></i>
+                <input 
+                  type="text" 
+                  placeholder="Juan"
+                  name="nombre" 
+                  required
+                  class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-brandOrange focus:ring-2 focus:ring-brandOrange/20 transition-all duration-300"
+                >
+              </div>
+            </div>
+
+            <!-- Apellido -->
+            <div class="relative group">
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Apellido</label>
+              <div class="relative">
+                <i class="fas fa-user absolute left-4 top-1/2 transform -translate-y-1/2 text-brandOrange/60"></i>
+                <input 
+                  type="text" 
+                  placeholder="Pérez"
+                  name="apellido" 
+                  required
+                  class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-brandOrange focus:ring-2 focus:ring-brandOrange/20 transition-all duration-300"
+                >
+              </div>
+            </div>
+
+            <!-- Teléfono -->
+            <div class="relative group">
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Teléfono</label>
+              <div class="relative">
+                <i class="fas fa-phone absolute left-4 top-1/2 transform -translate-y-1/2 text-brandOrange/60"></i>
+                <input 
+                  type="tel" 
+                  placeholder="+1 (555) 123-4567"
+                  name="telefono" 
+                  required
+                  class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-brandOrange focus:ring-2 focus:ring-brandOrange/20 transition-all duration-300"
+                >
+              </div>
+            </div>
+
+            <!-- Dirección -->
+            <div class="relative group">
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Dirección</label>
+              <div class="relative">
+                <i class="fas fa-map-marker-alt absolute left-4 top-1/2 transform -translate-y-1/2 text-brandOrange/60"></i>
+                <input 
+                  type="text" 
+                  placeholder="Calle Principal 123"
+                  name="direccion" 
+                  required
+                  class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-brandOrange focus:ring-2 focus:ring-brandOrange/20 transition-all duration-300"
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- Correo (ancho completo) -->
+          <div class="relative group pt-2">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Correo Electrónico</label>
+            <div class="relative">
+              <i class="fas fa-envelope absolute left-4 top-1/2 transform -translate-y-1/2 text-brandOrange/60"></i>
+              <input 
+                type="email" 
+                placeholder="tu@email.com" 
+                name="email" 
+                required
+                class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-brandOrange focus:ring-2 focus:ring-brandOrange/20 transition-all duration-300"
+              >
+            </div>
+          </div>
+
+          <!-- Contraseña (ancho completo) -->
+          <div class="relative group pt-2">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Contraseña</label>
+            <div class="relative">
+              <i class="fas fa-lock absolute left-4 top-1/2 transform -translate-y-1/2 text-brandOrange/60"></i>
+              <input 
+                type="password" 
+                placeholder="••••••••" 
+                name="contrasena" 
+                required
+                class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-brandOrange focus:ring-2 focus:ring-brandOrange/20 transition-all duration-300"
+              >
+            </div>
+            <p class="text-xs text-gray-500 mt-2">Mínimo 8 caracteres recomendado</p>
+          </div>
+
+          <!-- Checkbox de términos -->
+          <div class="flex items-start gap-3 pt-2 pb-4">
+            <input 
+              type="checkbox" 
+              id="terms" 
+              required
+              class="w-5 h-5 mt-0.5 border-2 border-gray-300 rounded cursor-pointer accent-brandOrange"
+            >
+            <label for="terms" class="text-sm text-gray-600">
+              Acepto los <a href="#" class="text-brandOrange font-semibold hover:text-orange-600">términos de servicio</a> y la <a href="#" class="text-brandOrange font-semibold hover:text-orange-600">política de privacidad</a>
+            </label>
+          </div>
+
+          <!-- Botón Registrar -->
+          <button 
+            type="submit"
+            class="w-full bg-gradient-to-r from-brandOrange to-orange-600 text-white py-3 rounded-lg font-bold text-lg hover:shadow-lg hover:scale-[1.02] transition-all duration-300 flex items-center justify-center gap-2 mt-6">
+            <i class="fas fa-user-plus"></i>
+            Crear Cuenta
+          </button>
+        </form>
+
+        <!-- Divider -->
+        <div class="relative flex items-center my-8">
+          <div class="flex-grow border-t-2 border-gray-200"></div>
+          <span class="px-4 text-gray-500 text-sm font-medium">¿Ya tienes cuenta?</span>
+          <div class="flex-grow border-t-2 border-gray-200"></div>
         </div>
 
-        <!-- Número de Teléfono -->
-        <div>
-          <input 
-            type="tel" 
-            placeholder="Número de teléfono" 
-            name="telefono" required
-            class="w-full px-4 py-2 border border-blue-900 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-        </div>
-
-        <!-- Dirección -->
-        <div>
-          <input 
-            type="text" 
-            placeholder="Dirección" 
-            name="direccion" required
-            class="w-full px-4 py-2 border border-blue-900 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-        </div>
-
-        <!-- Correo -->
-        <div>
-          <input 
-            type="text" 
-            placeholder="Correo electrónico" 
-            name="email" required
-            class="w-full px-4 py-2 border border-blue-900 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-        </div>
-
-        <!-- Contraseña -->
-        <div>
-          <input 
-            type="password" 
-            placeholder="Contraseña" 
-            name="contrasena" required
-            class="w-full px-4 py-2 border border-blue-900 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-        </div>
-
-        <!-- Botón Registrar -->
-        <button 
-          type="submit" 
-          class="w-full bg-[#39728A] text-white py-2 rounded hover:bg-[#2f5f74] transition duration-300">
-          Registrar
-        </button>
-      </form>
-
-      <!-- Enlace para volver al login -->
-        <div class="w-full flex justify-center mt-6 mb-6">
+        <!-- Enlace para volver al login -->
+        <div class="text-center">
           <a href="{{ url_for('auth.login') }}" 
-             class="text-brandOrange font-medium hover:text-orange-700 hover:underline">
-            ¿Ya tienes cuenta? Inicia sesión aquí
+             class="inline-flex items-center gap-2 text-brandOrange font-semibold hover:text-orange-600 transition-colors duration-200 text-lg">
+            Inicia sesión aquí
+            <i class="fas fa-arrow-right"></i>
           </a>
         </div>
+
+        <!-- Footer -->
+        <p class="text-center text-gray-600 text-sm mt-8">
+          ¿Necesitas ayuda? <a href="#" class="text-brandOrange font-semibold hover:text-orange-600">Contacta con soporte</a>
+        </p>
+      </div>
     </div>
   </div>
+
   <script src="{{ url_for('static', filename='js/flash.js') }}" defer></script>
 </body>
 </html>
