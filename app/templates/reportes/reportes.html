@@ -3,177 +3,163 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Reportes - Estadísticas</title>
-  <!-- Tailwind compilado localmente -->
+  <title>Reportes - Stockly</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-  
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-
-  <!-- Chart.js (CDN) -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script type="module" src="{{ url_for('static', filename='js/views/config.js') }}" defer></script>
-
+  <script type="module" src="{{ url_for('static', filename='js/views/reportes.js') }}" defer></script>
+  <style>[v-cloak] { display: none !important; }</style>
 </head>
 <body class="bg-brandTeal min-h-screen flex justify-center p-4">
-
-  <div class="w-full max-w-6xl bg-brandTeal rounded-lg p-4">
+  <div class="w-full max-w-7xl bg-brandTeal rounded-lg p-4">
     
     <!-- Header -->
-    <header class="items-center mb-4 relative">
+    <header class="items-center mb-6 relative">
       <div class="flex items-center justify-between">
-        <!-- Logo -->
-        <a href="{{ url_for('main.home') }}">
-          <img src="{{ url_for('static', filename='images/Logo_Stockly.png') }}" 
-               alt="Logo Stockly"
-               class="w-16 h-16 object-contain">
+        <a href="{{ url_for('main.home') }}" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
+          <img src="{{ url_for('static', filename='images/Logo_Stockly.png') }}" alt="Logo Stockly" class="w-16 h-16 object-contain">
         </a>
 
-        <!-- Nav -->
         <nav class="flex-1 flex justify-center">
-          <ul class="inline-flex bg-white/90 text-black rounded-full px-6 py-2 gap-8 items-center shadow">
-            <li><a href="{{ url_for('main.home') }}" class="text-black hover:text-brandOrange">Inicio</a></li>
-            <li><a href="{{ url_for('inventario.inventario') }}" class="text-black hover:text-brandOrange">Inventario</a></li>
-            <li><a href="{{ url_for('pedidos.pedidos') }}" class="text-black hover:text-brandOrange">Pedidos</a></li>
-            <li><a href="{{ url_for('reportes.reportes') }}" class="text-brandOrange font-bold">Reportes</a></li>
-            <li><a href="{{ url_for('cuenta.cuenta') }}" class="text-black hover:text-brandOrange">Cuenta</a></li>
+          <ul class="inline-flex bg-white/95 text-black rounded-full px-8 py-3 gap-8 items-center shadow-lg backdrop-blur-sm">
+            <li><a href="{{ url_for('main.home') }}" class="text-gray-700 hover:text-brandOrange transition-colors font-medium">Inicio</a></li>
+            <li><a href="{{ url_for('inventario.inventario') }}" class="text-gray-700 hover:text-brandOrange transition-colors font-medium">Inventario</a></li>
+            <li><a href="{{ url_for('pedidos.pedidos') }}" class="text-gray-700 hover:text-brandOrange transition-colors font-medium">Pedidos</a></li>
+            <li><a href="{{ url_for('reportes.reportes') }}" class="font-bold text-brandOrange">Reportes</a></li>
+            <li><a href="{{ url_for('cuenta.cuenta') }}" class="text-gray-700 hover:text-brandOrange transition-colors font-medium">Cuenta</a></li>
           </ul>
         </nav>
-                          <!-- botón ajustes: pegado dentro del header principal, en la esquina derecha -->
-      <div id="settings-root" class="relative">
-        <button id="btn-settings"
-                @click="toggleSettings"
-                :aria-expanded="showSettings"
-                aria-controls="settings-menu"
-                class="flex items-center justify-center w-10 h-10 rounded-full bg-white/90 text-gray-800 shadow hover:scale-105 transition-transform duration-200"
-                title="Ajustes">
-          <!-- icono (engranaje) simplificado para mejor apariencia -->
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="3" />
-            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
-          </svg>
-        </button>
 
-        <!-- menu desplegable -->
-        <div v-cloak v-show="showSettings" id="settings-menu" role="menu" :aria-hidden="!showSettings"
-            class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg ring-1 ring-black/5 overflow-hidden z-50 text-gray-900">
-          <ul class="divide-y divide-gray-100">
-            <li>
-              <a href="{{ url_for('configuraciones.proveedores') }}" @click="showSettings = false" class="block w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors">
-                Gestionar proveedores
-              </a>
-            </li>
-            <li>
-              <a href="{{ url_for('configuraciones.categorias') }}" @click="showSettings = false" class="block w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors">
-                Gestionar categorías
-              </a>
-            </li>
-          </ul>
+        <div id="settings-root" class="relative">
+          <button id="btn-settings" @click="toggleSettings" :aria-expanded="showSettings" aria-controls="settings-menu"
+                  class="flex items-center justify-center w-12 h-12 rounded-full bg-white/95 text-gray-800 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200" title="Ajustes">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3" />
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+            </svg>
+          </button>
+          <div v-cloak v-show="showSettings" id="settings-menu" role="menu" :aria-hidden="!showSettings"
+               class="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-2xl ring-1 ring-black/5 overflow-hidden z-50">
+            <ul class="divide-y divide-gray-100">
+              <li><a href="{{ url_for('configuraciones.proveedores') }}" @click="showSettings = false" 
+                   class="flex items-center gap-3 px-5 py-4 hover:bg-gray-50 transition-colors group">
+                  <svg class="w-5 h-5 text-gray-400 group-hover:text-brandOrange transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                  <span class="text-sm font-medium text-gray-900">Gestionar proveedores</span>
+                </a></li>
+              <li><a href="{{ url_for('configuraciones.categorias') }}" @click="showSettings = false" 
+                   class="flex items-center gap-3 px-5 py-4 hover:bg-gray-50 transition-colors group">
+                  <svg class="w-5 h-5 text-gray-400 group-hover:text-brandOrange transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                  </svg>
+                  <span class="text-sm font-medium text-gray-900">Gestionar categorías</span>
+                </a></li>
+            </ul>
+          </div>
         </div>
-      </div>
       </div>
     </header>
 
-    <!-- Contenido de estadísticas -->
-    <div class="bg-white rounded-lg p-6">
-      <div class="flex justify-between items-center mb-6">
-        <h2 class="text-3xl font-bold text-gray-800">Estadísticas</h2>
-        <button class="bg-brandOrange text-white px-4 py-2 rounded-full font-semibold hover:opacity-80 transition">
-          Descargar
-        </button>
-      </div>
-
-      <!-- Bloques principales -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <!-- Indicadores -->
-        <div class="space-y-4">
-          <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-full border-4 border-brandTeal flex items-center justify-center font-bold text-brandTeal text-sm">91%</div>
-            <span class="text-sm font-semibold">80%</span>
+    <!-- Contenido -->
+    <div id="vm-reportes" v-cloak class="bg-white rounded-xl shadow-lg overflow-hidden">
+      <div class="bg-gradient-to-r from-brandTeal/5 to-brandOrange/5 p-6 border-b border-gray-200">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-2xl font-bold text-gray-900">Reportes y Estadísticas</h2>
+            <p class="text-sm text-gray-600 mt-1">Visualiza el rendimiento de tu inventario</p>
           </div>
-          <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-full border-4 border-orange-300 flex items-center justify-center font-bold text-orange-400 text-sm">45%</div>
-            <span class="text-sm font-semibold">15.635</span>
-          </div>
-          <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-full border-4 border-orange-500 flex items-center justify-center font-bold text-orange-500 text-sm">67%</div>
-            <span class="text-sm font-semibold">4 Años</span>
-          </div>
-        </div>
-
-        <!-- Gráfico de dona -->
-        <div class="chart-container">
-          <canvas id="donutChart"></canvas>
-        </div>
-
-        <!-- Gráfico de barras -->
-        <div class="chart-container">
-          <canvas id="barChart"></canvas>
+          <button @click="downloadReport" 
+                  class="inline-flex items-center gap-2 px-6 py-3 bg-brandOrange text-white rounded-lg font-semibold hover:bg-orange-600 transition-colors shadow-md hover:shadow-lg">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            Descargar PDF
+          </button>
         </div>
       </div>
 
-      <!-- Gráfico de líneas -->
-      <div class="chart-container">
-        <canvas id="lineChart"></canvas>
+      <div class="p-6 space-y-6">
+        <!-- Indicadores principales -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6" v-if="stats">
+          <div class="bg-gradient-to-br from-brandTeal/10 to-brandTeal/5 rounded-xl p-6 border-2 border-brandTeal/20">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm font-medium text-gray-600 uppercase tracking-wide">Disponibilidad</p>
+                <p class="text-4xl font-bold text-brandTeal mt-2">[[ stats.indicators.availability ]]%</p>
+              </div>
+              <div class="w-16 h-16 rounded-full bg-brandTeal/20 flex items-center justify-center">
+                <svg class="w-8 h-8 text-brandTeal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-gradient-to-br from-brandOrange/10 to-brandOrange/5 rounded-xl p-6 border-2 border-brandOrange/20">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm font-medium text-gray-600 uppercase tracking-wide">Valor Total</p>
+                <p class="text-4xl font-bold text-brandOrange mt-2">$[[ stats.indicators.total_value ]]</p>
+              </div>
+              <div class="w-16 h-16 rounded-full bg-brandOrange/20 flex items-center justify-center">
+                <svg class="w-8 h-8 text-brandOrange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-gradient-to-br from-purple-100/50 to-purple-50/50 rounded-xl p-6 border-2 border-purple-200/50">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm font-medium text-gray-600 uppercase tracking-wide">Antigüedad Promedio Pedidos</p>
+                <p class="text-3xl font-bold text-purple-600 mt-2">[[ stats.indicators.avg_age ]]</p>
+              </div>
+              <div class="w-16 h-16 rounded-full bg-purple-200/50 flex items-center justify-center">
+                <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Gráficos -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+            <h3 class="text-lg font-bold text-gray-900 mb-4">Distribución por Categoría</h3>
+            <div class="h-64 flex items-center justify-center">
+              <canvas id="donutChart"></canvas>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+            <h3 class="text-lg font-bold text-gray-900 mb-4">Stock por Producto</h3>
+            <div class="h-64 flex items-center justify-center">
+              <canvas id="barChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+          <h3 class="text-lg font-bold text-gray-900 mb-4">Tendencia de Movimientos</h3>
+          <div class="h-80 flex items-center justify-center">
+            <canvas id="lineChart"></canvas>
+          </div>
+        </div>
+
+        <div v-if="error" class="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">Error: [[ error ]]</div>
+        <div v-if="loading" class="text-center py-12">
+          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-brandOrange mx-auto mb-4"></div>
+          <p class="text-gray-600">Cargando estadísticas...</p>
+        </div>
       </div>
     </div>
   </div>
-
-  <!-- Scripts de Chart.js -->
-  <script>
-    const donutChart = new Chart(document.getElementById('donutChart'), {
-      type: 'doughnut',
-      data: {
-        labels: ['Elemento 1', 'Elemento 2', 'Elemento 3', 'Elemento 4', 'Elemento 5'],
-        datasets: [{
-          data: [20, 20, 20, 20, 20],
-          backgroundColor: ['#3B82F6', '#F59E0B', '#10B981', '#EF4444', '#9CA3AF']
-        }]
-      },
-      options: {
-        maintainAspectRatio: false
-      }
-    });
-
-    const barChart = new Chart(document.getElementById('barChart'), {
-      type: 'bar',
-      data: {
-        labels: ['Serie 1', 'Serie 2', 'Serie 3'],
-        datasets: [{
-          label: 'Serie A',
-          data: [5, 10, 15],
-          backgroundColor: '#3B82F6'
-        },{
-          label: 'Serie B',
-          data: [8, 14, 18],
-          backgroundColor: '#F59E0B'
-        }]
-      },
-      options: {
-        maintainAspectRatio: false
-      }
-    });
-
-    const lineChart = new Chart(document.getElementById('lineChart'), {
-      type: 'line',
-      data: {
-        labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
-        datasets: [{
-          label: 'Serie A',
-          data: [5, 20, 12, 16, 9, 6],
-          borderColor: '#3B82F6',
-          fill: false
-        },{
-          label: 'Serie B',
-          data: [4, 12, 15, 18, 7, 14],
-          borderColor: '#F59E0B',
-          fill: false
-        }]
-      },
-      options: {
-        maintainAspectRatio: false
-      }
-    });
-  </script>
-
 </body>
 </html>

@@ -4,161 +4,164 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Editar Perfil - Stockly</title>
-
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-
-  <!-- CSRF token (si usas Flask-WTF / middleware) -->
   <meta name="csrf-token" content="{{ csrf_token() if csrf_token is defined else '' }}">
-
   <meta name="login-url" content="{{ url_for('auth.login') }}">
   <meta name="avatar-placeholder" content="{{ url_for('static', filename='images/avatar_placeholder.png') }}">
-
-  <!-- Vue -->
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-
-  <!-- Vista JS (module) -->
   <script type="module" src="{{ url_for('static', filename='js/views/cuenta_editar.js') }}" defer></script>
   <script type="module" src="{{ url_for('static', filename='js/views/config.js') }}" defer></script>
-  
 </head>
 <body class="bg-brandTeal min-h-screen flex justify-center p-4">
-  <div class="w-full max-w-6xl bg-brandTeal rounded-lg p-4">
-    <!-- Header -->
-    <header class="items-center mb-4 relative">
+  <div class="w-full max-w-7xl bg-brandTeal rounded-lg p-4">
+    
+    <header class="items-center mb-6 relative">
       <div class="flex items-center justify-between">
-        <a href="{{ url_for('main.home') }}" class="flex items-center gap-3" aria-label="Ir al inicio">
+        <a href="{{ url_for('main.home') }}" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
           <img src="{{ url_for('static', filename='images/Logo_Stockly.png') }}" alt="Logo Stockly" class="w-16 h-16 object-contain">
         </a>
 
-        <nav class="flex-1 flex justify-center" aria-label="Navegación principal">
-          <ul class="inline-flex bg-white/90 text-black rounded-full px-6 py-2 gap-8 items-center shadow">
-            <li><a href="{{ url_for('main.home') }}" class="text-black hover:text-brandOrange">Inicio</a></li>
-            <li><a href="{{ url_for('inventario.inventario') }}" class="text-black hover:text-brandOrange">Inventario</a></li>
-            <li><a href="{{ url_for('pedidos.pedidos') }}" class="text-black hover:text-brandOrange">Pedidos</a></li>
-            <li><a href="{{ url_for('reportes.reportes') }}" class="text-black hover:text-brandOrange">Reportes</a></li>
-            <li><a href="{{ url_for('cuenta.cuenta') }}" class="font-semibold text-brandOrange">Cuenta</a></li>
+        <nav class="flex-1 flex justify-center">
+          <ul class="inline-flex bg-white/95 text-black rounded-full px-8 py-3 gap-8 items-center shadow-lg backdrop-blur-sm">
+            <li><a href="{{ url_for('main.home') }}" class="text-gray-700 hover:text-brandOrange transition-colors font-medium">Inicio</a></li>
+            <li><a href="{{ url_for('inventario.inventario') }}" class="text-gray-700 hover:text-brandOrange transition-colors font-medium">Inventario</a></li>
+            <li><a href="{{ url_for('pedidos.pedidos') }}" class="text-gray-700 hover:text-brandOrange transition-colors font-medium">Pedidos</a></li>
+            <li><a href="{{ url_for('reportes.reportes') }}" class="text-gray-700 hover:text-brandOrange transition-colors font-medium">Reportes</a></li>
+            <li><a href="{{ url_for('cuenta.cuenta') }}" class="font-bold text-brandOrange">Cuenta</a></li>
           </ul>
         </nav>
 
-              <!-- botón ajustes: pegado dentro del header principal, en la esquina derecha -->
-      <div id="settings-root" class="relative">
-        <button id="btn-settings"
-                @click="toggleSettings"
-                :aria-expanded="showSettings"
-                aria-controls="settings-menu"
-                class="flex items-center justify-center w-10 h-10 rounded-full bg-white/90 text-gray-800 shadow hover:scale-105 transition-transform duration-200"
-                title="Ajustes">
-          <!-- icono (engranaje) simplificado para mejor apariencia -->
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="3" />
-            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
-          </svg>
-        </button>
-
-        <!-- menu desplegable -->
-        <div v-cloak v-show="showSettings" id="settings-menu" role="menu" :aria-hidden="!showSettings"
-            class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg ring-1 ring-black/5 overflow-hidden z-50 text-gray-900">
-          <ul class="divide-y divide-gray-100">
-            <li>
-              <a href="{{ url_for('configuraciones.proveedores') }}" @click="showSettings = false" class="block w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors">
-                Gestionar proveedores
-              </a>
-            </li>
-            <li>
-              <a href="{{ url_for('configuraciones.categorias') }}" @click="showSettings = false" class="block w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors">
-                Gestionar categorías
-              </a>
-            </li>
-          </ul>
+        <div id="settings-root" class="relative">
+          <button id="btn-settings" @click="toggleSettings" :aria-expanded="showSettings"
+                  class="flex items-center justify-center w-12 h-12 rounded-full bg-white/95 text-gray-800 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200" title="Ajustes">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3" />
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+            </svg>
+          </button>
+          <div v-cloak v-show="showSettings" id="settings-menu" role="menu" :aria-hidden="!showSettings"
+               class="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-2xl ring-1 ring-black/5 overflow-hidden z-50">
+            <ul class="divide-y divide-gray-100">
+              <li><a href="{{ url_for('configuraciones.proveedores') }}" @click="showSettings = false" 
+                   class="flex items-center gap-3 px-5 py-4 hover:bg-gray-50 transition-colors group">
+                  <svg class="w-5 h-5 text-gray-400 group-hover:text-brandOrange transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                  <span class="text-sm font-medium text-gray-900">Gestionar proveedores</span>
+                </a></li>
+              <li><a href="{{ url_for('configuraciones.categorias') }}" @click="showSettings = false" 
+                   class="flex items-center gap-3 px-5 py-4 hover:bg-gray-50 transition-colors group">
+                  <svg class="w-5 h-5 text-gray-400 group-hover:text-brandOrange transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                  </svg>
+                  <span class="text-sm font-medium text-gray-900">Gestionar categorías</span>
+                </a></li>
+            </ul>
+          </div>
         </div>
-      </div>
       </div>
     </header>
 
-    <main id="vm-edit" class="bg-white/95 rounded-2xl p-6 shadow-lg w-full">
-  <h1 class="text-3xl font-extrabold text-brandOrange mb-4">Editar perfil</h1>
-
-  <div v-if="loading" class="py-8 text-center text-gray-500">Cargando...</div>
-
-  <form v-else @submit.prevent="submit" class="grid grid-cols-1 md:grid-cols-4 gap-6 items-start">
-    <!-- Columna izquierda: avatar (ocupa 1/4 en md) -->
-    <div class="md:col-span-1 flex flex-col items-center md:items-start gap-4">
-      <div class="md:col-span-1 flex flex-col items-center gap-4">
-      <div class="w-48 h-48 md:w-56 md:h-56 rounded-full bg-gray-100 overflow-hidden shadow-md flex items-center justify-center">
-        <img :src="currentAvatar" alt="Avatar" class="w-full h-full object-cover">
+    <main id="vm-edit" class="bg-white rounded-xl shadow-lg overflow-hidden">
+      <div class="bg-gradient-to-r from-brandTeal/5 to-brandOrange/5 p-6 border-b border-gray-200">
+        <h1 class="text-2xl font-bold text-gray-900">Editar Perfil</h1>
+        <p class="text-sm text-gray-600 mt-1">Actualiza tu información personal</p>
       </div>
 
-      <div class="flex flex-col items-center gap-2">
-        <input @change="onAvatarChange" ref="avatarInput" id="avatarFileInput" type="file" accept="image/*" class="hidden" />
-        <label for="avatarFileInput"
-              class="cursor-pointer inline-flex items-center justify-center gap-2 px-3 py-2 rounded-md bg-white border text-sm shadow-sm hover:bg-gray-50 mx-auto">
-          <!-- svg -->
-          Cambiar foto
-        </label>
-        <p class="text-xs text-gray-500 text-center">PNG, JPG — máximo 2MB</p>
-      </div>
-    </div>
-
-
-      <!-- En pantallas pequeñas movemos botón guardar aquí (opcional) -->
-      <div class="w-full md:hidden mt-2">
-        <button type="submit" :disabled="saving" class="w-full px-4 py-2 rounded bg-brandTeal text-white hover:opacity-95">
-          <span v-if="!saving">Guardar cambios</span>
-          <span v-else>Guardando...</span>
-        </button>
-      </div>
-    </div>
-
-    <!-- Columna derecha: campos (ocupa 3/4 en md) -->
-    <div class="md:col-span-3 w-full">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Nombre</label>
-          <input v-model="form.nombre" type="text" required class="mt-1 p-2 border rounded w-full" placeholder="Nombre" />
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Apellido</label>
-          <input v-model="form.apellido" type="text" class="mt-1 p-2 border rounded w-full" placeholder="Apellido" />
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Correo electrónico</label>
-          <input v-model="form.email" type="email" required class="mt-1 p-2 border rounded w-full" placeholder="correo@ejemplo.com" />
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Teléfono</label>
-          <input v-model="form.numerotelefono" type="tel" class="mt-1 p-2 border rounded w-full" placeholder="(+503) 1234 5678" />
-        </div>
-
-        <div class="md:col-span-2">
-          <label class="block text-sm font-medium text-gray-700">Dirección</label>
-          <textarea v-model="form.direccion" rows="2" class="mt-1 p-2 border rounded w-full" placeholder="Dirección"></textarea>
-        </div>
-
-        <div class="md:col-span-2">
-          <label class="block text-sm font-medium text-gray-700">Contraseña (dejar en blanco para no cambiar)</label>
-          <input v-model="form.contrasena" type="password" class="mt-1 p-2 border rounded w-full" placeholder="Nueva contraseña (opcional)" />
-        </div>
+      <div v-if="loading" class="p-12 text-center">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-brandOrange mx-auto mb-4"></div>
+        <p class="text-gray-600">Cargando...</p>
       </div>
 
-      <!-- Acciones (ocultas en mobile porque ya mostramos botón arriba) -->
-      <div class="mt-6 hidden md:flex items-center justify-end gap-3">
-        <a href="{{ url_for('cuenta.cuenta') }}" class="px-4 py-2 rounded border border-gray-300 text-gray-800 hover:bg-gray-50">Cancelar</a>
-        <button type="submit" :disabled="saving" class="px-4 py-2 rounded bg-brandTeal text-white hover:opacity-95">
-          <span v-if="!saving">Guardar cambios</span>
-          <span v-else>Guardando...</span>
-        </button>
-      </div>
+      <form v-else @submit.prevent="submit" class="p-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <!-- Avatar -->
+          <div class="md:col-span-1 flex flex-col items-center gap-4">
+            <div class="w-40 h-40 rounded-full bg-gradient-to-br from-brandTeal to-brandOrange p-1 shadow-xl">
+              <div class="w-full h-full rounded-full bg-white flex items-center justify-center overflow-hidden">
+                <img :src="currentAvatar" alt="Avatar" class="w-full h-full object-cover">
+              </div>
+            </div>
+            <input @change="onAvatarChange" ref="avatarInput" id="avatarFileInput" type="file" accept="image/*" class="hidden" />
+            <label for="avatarFileInput"
+                   class="cursor-pointer inline-flex items-center gap-2 px-4 py-2 bg-white border-2 border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors shadow-sm">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              Cambiar foto
+            </label>
+            <p class="text-xs text-gray-500 text-center">PNG, JPG — máx. 2MB</p>
+          </div>
 
-      <div v-if="message" class="mt-4">
-        <p :class="{'text-green-600': messageType==='success', 'text-red-600': messageType==='error'}">[[ message ]]</p>
-      </div>
-    </div>
-  </form>
+          <!-- Campos -->
+          <div class="md:col-span-3 space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-semibold text-gray-800 mb-2">Nombre <span class="text-red-500">*</span></label>
+                <input v-model="form.nombre" type="text" required 
+                       class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-brandOrange focus:border-transparent transition-all" placeholder="Nombre" />
+              </div>
 
-  <!-- Hidden plain form fallback (POST) -->
+              <div>
+                <label class="block text-sm font-semibold text-gray-800 mb-2">Apellido</label>
+                <input v-model="form.apellido" type="text" 
+                       class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-brandOrange focus:border-transparent transition-all" placeholder="Apellido" />
+              </div>
+
+              <div>
+                <label class="block text-sm font-semibold text-gray-800 mb-2">Email <span class="text-red-500">*</span></label>
+                <input v-model="form.email" type="email" required 
+                       class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-brandOrange focus:border-transparent transition-all" placeholder="correo@ejemplo.com" />
+              </div>
+
+              <div>
+                <label class="block text-sm font-semibold text-gray-800 mb-2">Teléfono</label>
+                <input v-model="form.numerotelefono" type="tel" 
+                       class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-brandOrange focus:border-transparent transition-all" placeholder="+503 1234-5678" />
+              </div>
+
+              <div class="md:col-span-2">
+                <label class="block text-sm font-semibold text-gray-800 mb-2">Dirección</label>
+                <textarea v-model="form.direccion" rows="2" 
+                          class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-brandOrange focus:border-transparent transition-all resize-none" placeholder="Dirección completa"></textarea>
+              </div>
+
+              <div class="md:col-span-2">
+                <label class="block text-sm font-semibold text-gray-800 mb-2">Nueva Contraseña</label>
+                <input v-model="form.contrasena" type="password" 
+                       class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-brandOrange focus:border-transparent transition-all" placeholder="Dejar en blanco para no cambiar" />
+                <p class="text-xs text-gray-500 mt-1">Solo completa este campo si deseas cambiar tu contraseña</p>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-3 pt-6 border-t border-gray-200">
+              <a href="{{ url_for('cuenta.cuenta') }}" 
+                 class="px-6 py-2.5 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors">
+                Cancelar
+              </a>
+              <button type="submit" :disabled="saving" 
+                      class="px-6 py-2.5 bg-brandOrange text-white rounded-lg font-medium hover:bg-orange-600 transition-colors shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">
+                <span v-if="!saving">Guardar cambios</span>
+                <span v-else class="flex items-center gap-2">
+                  <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Guardando...
+                </span>
+              </button>
+            </div>
+
+            <div v-if="message" class="mt-4 p-4 rounded-lg" :class="messageType==='success' ? 'bg-green-50 border border-green-200 text-green-700' : 'bg-red-50 border border-red-200 text-red-700'">
+              [[ message ]]
+            </div>
+          </div>
+        </div>
+      </form>
+    </main>
+  </div>
+
   <form id="fallback-post-form" action="{{ url_for('cuenta.editar_cuenta') }}" method="POST" class="hidden" enctype="multipart/form-data">
     <input type="hidden" name="nombre" v-bind:value="form.nombre" />
     <input type="hidden" name="apellido" v-bind:value="form.apellido" />
@@ -167,4 +170,5 @@
     <input type="hidden" name="direccion" v-bind:value="form.direccion" />
     <input type="hidden" name="contrasena" v-bind:value="form.contrasena" />
   </form>
-</main>
+</body>
+</html>
