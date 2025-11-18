@@ -12,7 +12,6 @@
     .modal-enter-active, .modal-leave-active { transition: all 180ms ease; }
     .modal-enter-from, .modal-leave-to { opacity: 0; transform: translateY(8px) scale(.99); }
     .modal-enter-to, .modal-leave-from { opacity: 1; transform: translateY(0) scale(1); }
-<<<<<<< HEAD
     [v-cloak] { display: none !important; }
   </style>
 </head>
@@ -116,115 +115,21 @@
                       <path d="M14 11v6" stroke-linecap="round" stroke-linejoin="round"></path>
                     </svg>
                   </button>
-=======
-
-    /* ocultar antes de que Vue monte (v-cloak global) */
-    [v-cloak] { display: none !important; }
-  </style>
-</head>
-<body class="bg-brandTeal min-h-screen flex justify-center p-4 text-black">
-  <div class="w-full max-w-6xl bg-brandTeal rounded-lg p-4">
-    <!-- header (igual que tu original) -->
-    <header class="items-center mb-4 relative">
-      <div class="flex items-center justify-between">
-        <a href="{{ url_for('main.home') }}" class="flex items-center gap-3">
-          <img src="{{ url_for('static', filename='images/Logo_Stockly.png') }}" alt="Logo" class="w-16 h-16 object-contain">
-        </a>
-        <nav class="flex-1 flex justify-center">
-          <ul class="inline-flex bg-white/90 text-black rounded-full px-6 py-2 gap-8 items-center shadow">
-            <li><a href="{{ url_for('main.home') }}" class="text-black hover:text-brandOrange">Inicio</a></li>
-            <li><a href="{{ url_for('inventario.inventario') }}" class="text-black hover:text-brandOrange">Inventario</a></li>
-            <li><a href="{{ url_for('pedidos.pedidos') }}" class="text-black hover:text-brandOrange">Pedidos</a></li>
-            <li><a href="{{ url_for('reportes.reportes') }}" class="text-black hover:text-brandOrange">Reportes</a></li>
-            <li><a href="{{ url_for('cuenta.cuenta') }}" class="font-semibold text-brandOrange">Cuenta</a></li>
-          </ul>
-        </nav>
-                          <!-- botón ajustes: pegado dentro del header principal, en la esquina derecha -->
-      <div id="settings-root" class="relative">
-        <button id="btn-settings"
-                @click="toggleSettings"
-                :aria-expanded="showSettings"
-                aria-controls="settings-menu"
-                class="flex items-center justify-center w-10 h-10 rounded-full bg-white/90 text-gray-800 shadow hover:scale-105 transition-transform duration-200"
-                title="Ajustes">
-          <!-- icono (engranaje) simplificado para mejor apariencia -->
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="3" />
-            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
-          </svg>
-        </button>
-
-        <!-- menu desplegable -->
-        <div v-cloak v-show="showSettings" id="settings-menu" role="menu" :aria-hidden="!showSettings"
-            class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg ring-1 ring-black/5 overflow-hidden z-50 text-gray-900">
-          <ul class="divide-y divide-gray-100">
-            <li>
-              <a href="{{ url_for('configuraciones.proveedores') }}" @click="showSettings = false" class="block w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors">
-                Gestionar proveedores
-              </a>
-            </li>
-            <li>
-              <a href="{{ url_for('configuraciones.categorias') }}" @click="showSettings = false" class="block w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors">
-                Gestionar categorías
-              </a>
-            </li>
-          </ul>
-        </div>
-      </div>
-      </div>
-    </header>
-
-    <!-- ROOT de Vue con v-cloak -->
-    <main id="vm-proveedores" v-cloak class="bg-white/95 rounded-2xl p-6 shadow-lg">
-      <div class="flex items-center justify-between mb-4">
-        <h1 class="text-2xl font-bold text-brandOrange">Proveedores</h1>
-        <button @click="openProviderModal(null)" class="bg-brandOrange text-white px-4 py-2 rounded-full">+ Crear proveedor</button>
-      </div>
-
-      <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
-            <tr>
-              <th class="p-3 text-left text-sm font-medium text-gray-700">Código</th>
-              <th class="p-3 text-left text-sm font-medium text-gray-700">Nombre</th>
-              <th class="p-3 text-left text-sm font-medium text-gray-700">Teléfono</th>
-              <th class="p-3 text-left text-sm font-medium text-gray-700">Email</th>
-              <th class="p-3 text-left text-sm font-medium text-gray-700">Dirección</th>
-              <th class="p-3 text-left text-sm font-medium text-gray-700">Acciones</th>
-            </tr>
-          </thead>
-          <tbody class="bg-white divide-y">
-            <tr v-for="prov in providers" :key="prov.proveedor_id" class="hover:bg-gray-50">
-              <td class="p-3">[[ prov.proveedor_codigo ]]</td>
-              <td class="p-3">[[ prov.proveedor_nombre ]]</td>
-              <td class="p-3">[[ prov.numerotelefono ]]</td>
-              <td class="p-3">[[ prov.email ]]</td>
-              <td class="p-3">[[ prov.direccion ]]</td>
-              <td class="p-3">
-                <div class="flex gap-2">
-                  <button @click="openProviderModal(prov)" class="px-2 py-1 rounded bg-white/80 border text-indigo-600">Editar</button>
-                  <button @click="removeProvider(prov.proveedor_id)" class="px-2 py-1 rounded bg-white/80 border text-red-600">Eliminar</button>
->>>>>>> origin/main
                 </div>
               </td>
             </tr>
             <tr v-if="providers.length===0">
-<<<<<<< HEAD
               <td colspan="6" class="p-12 text-center">
                 <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
                 <p class="text-gray-500 font-medium">No hay proveedores registrados</p>
               </td>
-=======
-              <td colspan="6" class="p-4 text-center text-gray-500">No hay proveedores.</td>
->>>>>>> origin/main
             </tr>
           </tbody>
         </table>
       </div>
 
-<<<<<<< HEAD
       <teleport to="body">
         <transition name="modal">
           <div v-cloak v-if="showProviderModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -274,40 +179,6 @@
                 <div class="flex justify-end gap-3 pt-4 border-t border-gray-200">
                   <button type="button" @click="closeProviderModal" class="px-6 py-2.5 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors">Cancelar</button>
                   <button type="submit" class="px-6 py-2.5 bg-brandOrange text-white rounded-lg font-medium hover:bg-orange-600 transition-colors shadow-md hover:shadow-lg">Guardar</button>
-=======
-      <!-- Modal: teleport AL CUERPO. IMPORTANTE: también tiene v-cloak para ocultarlo antes del montaje -->
-      <teleport to="body">
-        <transition name="modal">
-          <div v-cloak v-if="showProviderModal" class="fixed inset-0 z-50 flex items-center justify-center">
-            <div class="absolute inset-0 bg-black/40" @click="closeProviderModal"></div>
-            <div class="relative bg-white rounded-2xl p-6 shadow-2xl w-full max-w-md">
-              <h3 class="text-xl font-bold mb-4">[[ editingProvider ? 'Editar proveedor' : 'Nuevo proveedor' ]]</h3>
-              <form @submit.prevent="saveProvider" class="space-y-3">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700">Código *</label>
-                  <input id="prov-codigo" v-model="providerForm.proveedor_codigo" required class="w-full p-2 border rounded" placeholder="Ej. PROV001">
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700">Nombre *</label>
-                  <input v-model="providerForm.proveedor_nombre" required class="w-full p-2 border rounded" placeholder="Ej. Proveedor A">
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700">Teléfono</label>
-                  <input v-model="providerForm.numerotelefono" class="w-full p-2 border rounded" placeholder="Ej. 1234-5678">
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700">Email</label>
-                  <input v-model="providerForm.email" type="email" class="w-full p-2 border rounded" placeholder="Ej. contacto@empresa.com">
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700">Dirección</label>
-                  <textarea v-model="providerForm.direccion" class="w-full p-2 border rounded" rows="3" placeholder="Ej. Calle Principal 123, Ciudad"></textarea>
-                </div>
-
-                <div class="flex justify-end gap-3 pt-2">
-                  <button type="button" @click="closeProviderModal" class="px-4 py-2 rounded bg-gray-200">Cancelar</button>
-                  <button type="submit" class="px-4 py-2 rounded bg-brandOrange text-white">Guardar</button>
->>>>>>> origin/main
                 </div>
               </form>
             </div>
@@ -317,8 +188,4 @@
     </main>
   </div>
 </body>
-<<<<<<< HEAD
 </html>
-=======
-</html>
->>>>>>> origin/main

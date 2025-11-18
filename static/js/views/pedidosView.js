@@ -1,29 +1,17 @@
-<<<<<<< HEAD
-=======
-// static/js/views/pedidosView.js
->>>>>>> origin/main
 (() => {
   const { createApp } = Vue;
 
   const app = createApp({
-<<<<<<< HEAD
     data() {
       return {
         pedidos: [],
         proveedores: [],
 
-=======
-    delimiters: ['[[', ']]'],
-    data() {
-      return {
-        pedidos: [],
->>>>>>> origin/main
         query: '',
         isModalOpen: false,
         modalContent: '',
         loadingModal: false,
         modalTitle: '',
-<<<<<<< HEAD
         modalUrls: {},
 
         // UI
@@ -39,14 +27,10 @@
           min_total: null,
           max_total: null
         }
-=======
-        modalUrls: {}
->>>>>>> origin/main
       };
     },
     computed: {
       filteredPedidos() {
-<<<<<<< HEAD
         // start with shallow copy
         let list = Array.isArray(this.pedidos) ? this.pedidos.slice() : [];
 
@@ -110,14 +94,6 @@
         }
 
         return list;
-=======
-        if (!this.query) return this.pedidos;
-        const q = this.query.toLowerCase();
-        return this.pedidos.filter(p =>
-          (p.codigo && p.codigo.toLowerCase().includes(q)) ||
-          (p.proveedor_nombre && p.proveedor_nombre.toLowerCase().includes(q))
-        );
->>>>>>> origin/main
       }
     },
     async mounted() {
@@ -127,7 +103,6 @@
       } catch (e) {
         this.modalUrls = {};
       }
-<<<<<<< HEAD
       await Promise.all([ this.loadProveedores(), this.loadPedidos() ]);
     },
     methods: {
@@ -181,31 +156,13 @@
             ? raw.map(p => ({ ...p, total: Number(p.total) || 0 }))
             : [];
           console.log('Pedidos cargados:', this.pedidos);
-=======
-      await this.loadPedidos();
-    },
-    methods: {
-      async loadPedidos() {
-        try {
-          if (window.pedidosService && typeof window.pedidosService.list === 'function') {
-            this.pedidos = await window.pedidosService.list();
-          } else {
-            this.pedidos = [
-              { id: 1, codigo: '001', proveedor_nombre: 'Proveedor A', fecha: '2025-11-01', cantidad: 5, total: 120.00, estado: 'pendiente' },
-              { id: 2, codigo: '002', proveedor_nombre: 'Proveedor B', fecha: '2025-11-03', cantidad: 2, total: 50.00, estado: 'entregado' }
-            ];
-          }
->>>>>>> origin/main
         } catch (e) {
           console.error('Error cargando pedidos', e);
           this.pedidos = [];
         }
       },
 
-<<<<<<< HEAD
       // abrir modal (mantengo tu lógica)
-=======
->>>>>>> origin/main
       async openModal(name, id = null) {
         try {
           const root = document.getElementById('pedidosApp');
@@ -231,42 +188,19 @@
           this.modalContent = html;
           this.loadingModal = false;
 
-<<<<<<< HEAD
           this.$nextTick(() => {
             let container = this.$refs.modalRoot ? this.$refs.modalRoot.querySelector('[data-modal-type]') || this.$refs.modalRoot.firstElementChild || this.$refs.modalRoot : document.querySelector('[data-modal-type]');
-=======
-          // inicializador: esperar a que v-html haya insertado el HTML
-          this.$nextTick(() => {
-            // ref modalRoot en tu template (v-html div debe tener ref="modalRoot")
-            const modalRoot = this.$refs.modalRoot;
-            // si no hay ref, buscar el fragment inyectado
-            let container = null;
-            if (modalRoot) {
-              // buscar el partial dentro del nodo ref
-              container = modalRoot.querySelector('[data-modal-type]') || modalRoot.firstElementChild || modalRoot;
-            } else {
-              container = document.querySelector('[data-modal-type]') || document.querySelector('.bg-white.rounded-lg .p-4');
-            }
->>>>>>> origin/main
 
             if (!container) {
               console.warn('initCrearEditarPedido: no se encontró contenedor tras v-html');
               return;
             }
 
-<<<<<<< HEAD
-=======
-            // determinar id preferentemente desde data attribute
->>>>>>> origin/main
             let parsedId = id;
             const dataAttrEl = container.querySelector('[data-pedido-id]') || container;
             if (dataAttrEl && dataAttrEl.dataset && dataAttrEl.dataset.pedidoId) {
               parsedId = parsedId || dataAttrEl.dataset.pedidoId || null;
             } else {
-<<<<<<< HEAD
-=======
-              // fallback: extraer id del querystring del url
->>>>>>> origin/main
               try {
                 const u = new URL(url, window.location.origin);
                 parsedId = parsedId || u.searchParams.get('id') || null;
@@ -291,7 +225,6 @@
       closeModal() {
         this.isModalOpen = false;
         this.modalContent = '';
-<<<<<<< HEAD
       },
 
       toggleSettings() {
@@ -320,20 +253,9 @@
           min_total: null,
           max_total: null
         };
-=======
->>>>>>> origin/main
       }
     }
   });
 
-<<<<<<< HEAD
-=======
-  app.mixin({
-    mounted() {
-      // placeholder para $refs
-    }
-  });
-
->>>>>>> origin/main
   app.mount('#pedidosApp');
 })();
